@@ -1,0 +1,12 @@
+.monaco-editor .margin {
+  padding-right: 4px; /* Adjust the padding as needed */
+}
+
+.editor-container {
+  position: absolute;
+  top: 0;
+}
+
+.editor-container:nth-child(2) {
+  left: 50%;
+}

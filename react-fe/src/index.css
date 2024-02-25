@@ -1,10 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import CodeMirror styles */
-@import '~codemirror/lib/codemirror.css';
-
 * {
     font-family: 'Urbanist', sans-serif;
 }

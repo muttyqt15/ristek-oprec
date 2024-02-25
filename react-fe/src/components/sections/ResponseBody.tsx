@@ -1,20 +1,13 @@
-// import React from "react";
-// import jsonResponse from "../../utils/helpers/placeholders.json";
-// import JsonEditor from "../elements/JsonEditor";
+import { JsonCode } from "./RequestBody";
 
-// const ResponseBody: React.FC = () => {
-//   const response = JSON.stringify(jsonResponse, null, 2);
+const ResponseBody = ({ newCode }: {newCode: JsonCode | string}) => {
+  return (
+    <div className="max-w-[550px] w-full border-none rounded-xl h-[200px] bg-slate-900 text-white overflow-x-auto">
+      <pre className="p-2 overflow-y-auto text-green-300 break-all whitespace-pre-wrap">
+        <p>{JSON.stringify(newCode, null, 2)}</p>
+      </pre>
+    </div>
+  );
+};
 
-//   return (
-//     <div className="min-w-[440px] border-none mt-4 h-44 rounded-md bg-gray-700">
-//       <div className="h-1/6 border px-4 bg-white rounded-t-md flex items-center justify-center">
-//         <h1 className="font-extrabold">Response</h1>
-//       </div>
-//       <div className="p-4">
-//         <JsonEditor value={response} />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ResponseBody;
+export default ResponseBody;
