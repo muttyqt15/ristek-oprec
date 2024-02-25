@@ -8,7 +8,7 @@ interface UrlHolderProps {
   setUrl: React.Dispatch<React.SetStateAction<string>>;
   method: string;
   setMethod: React.Dispatch<React.SetStateAction<string>>;
-  handleRequest: (e: React.MouseEvent<HTMLButtonElement>) => void; // Add handleSubmit prop
+  handleRequest: (e: React.MouseEvent<HTMLButtonElement>) => void; 
 }
 
 const UrlHolder: React.FC<UrlHolderProps> = ({
