@@ -22,3 +22,9 @@ export class CreatePiDto {
   @IsEnum(PengurusIntiRole)
   pi_role: PengurusIntiRole;
 }
+
+export class UpdatePIDto {
+  @IsNotEmpty()
+  @IsString()
+  name?: string;
+}

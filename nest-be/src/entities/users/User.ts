@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { MainRole } from './types/entity.types';
+import { GlobalAuthorityLevel, MainRole } from './types/entity.types';
 
 @Entity({ name: 'users' })
 export abstract class User {
@@ -21,4 +21,12 @@ export abstract class User {
     default: MainRole.NON_STAFF,
   })
   role: MainRole;
+
+  @Column({
+    type: 'enum',
+    enum: GlobalAuthorityLevel,
+    nullable: true,
+    default: GlobalAuthorityLevel.GLOBAL_ADMIN, // Because a user that isnt logged in is outside of OKK context (like a god)
+  })
+  global_authority: GlobalAuthorityLevel;
 }

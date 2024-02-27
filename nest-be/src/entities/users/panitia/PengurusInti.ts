@@ -1,11 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { User } from '../User';
-import { MainRole } from '../types/entity.types';
-import {
-  AuthorityLevelPI,
-  PengurusIntiRole,
-  adminTypes,
-} from '../types/pi.types';
+import { GlobalAuthorityLevel, MainRole } from '../types/entity.types';
+import { PengurusIntiRole } from '../types/pi.types';
 
 @Entity({ name: 'pengurus_inti' })
 export class PengurusInti extends User {
@@ -17,19 +13,18 @@ export class PengurusInti extends User {
 
   @Column({
     type: 'enum',
-    enum: AuthorityLevelPI,
-    default: AuthorityLevelPI.NORMAL,
-    nullable: true,
+    enum: GlobalAuthorityLevel,
+    default: GlobalAuthorityLevel.CONTEXT_ADMIN, // Because a user that isnt logged in is outside of OKK context (like a god)
   })
-  authority_level: AuthorityLevelPI;
+  global_authority: GlobalAuthorityLevel = GlobalAuthorityLevel.CONTEXT_ADMIN;
 
-  constructor() {
-    super();
+  //   constructor() {
+  //     super();
 
-    if (adminTypes.includes(this.pi_role)) {
-      this.authority_level = AuthorityLevelPI.ADMIN;
-    } else {
-      this.authority_level = AuthorityLevelPI.NORMAL;
-    }
-  }
+  //     if (adminTypes.includes(this.pi_role)) {
+  //       this.pi_authority_level = AuthorityLevelPI.ADMIN;
+  //     } else {
+  //       this.pi_authority_level = AuthorityLevelPI.NORMAL;
+  //     }
+  //   }
 }

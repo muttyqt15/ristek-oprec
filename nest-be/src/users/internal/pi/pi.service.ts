@@ -4,6 +4,7 @@ import { PengurusInti } from 'src/entities/users/panitia/PengurusInti';
 import { hashPassword } from 'src/utils/hash';
 import { Repository } from 'typeorm';
 import { CreatePIParams } from './pi.types';
+import { UpdatePIDto } from './pi.dto';
 
 @Injectable()
 export class PiService {
@@ -12,6 +13,11 @@ export class PiService {
     private readonly pengurusIntiRepository: Repository<PengurusInti>,
   ) {}
 
+  async getAllPengurusInti() {
+    return await this.pengurusIntiRepository.find();
+  }
+
+  // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
   async createPengurusInti(bodyDetails: CreatePIParams) {
     try {
       const existingPI = await this.pengurusIntiRepository.find({
@@ -50,5 +56,36 @@ export class PiService {
         );
       }
     }
+  }
+  async updatePengurusInti(pi_id: number, updateDetails: UpdatePIDto) {
+    try {
+      const updatedPi = await this.pengurusIntiRepository.update(
+        { id: pi_id },
+        updateDetails,
+      );
+      if (updatedPi.affected === 0) {
+        throw new HttpException(
+          'Pengurus Inti not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return await updatedPi;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Failed to update Pengurus Inti',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async deleteAllPI() {
+    let status = false;
+    try {
+      await this.pengurusIntiRepository.delete({});
+      status = true;
+    } catch (err) {
+      console.error(err);
+    }
+    return status;
   }
 }
