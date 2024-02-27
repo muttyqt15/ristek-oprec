@@ -8,7 +8,7 @@ interface UrlHolderProps {
   setUrl: React.Dispatch<React.SetStateAction<string>>;
   method: string;
   setMethod: React.Dispatch<React.SetStateAction<string>>;
-  handleRequest: (e: React.MouseEvent<HTMLButtonElement>) => void; 
+  handleRequest: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const UrlHolder: React.FC<UrlHolderProps> = ({
@@ -21,7 +21,7 @@ const UrlHolder: React.FC<UrlHolderProps> = ({
   const [selectedMethod, setSelectedMethod] = React.useState(method);
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
+    setUrl(e.target.value)
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -60,8 +60,7 @@ const UrlHolder: React.FC<UrlHolderProps> = ({
       </div>
       <Button
         className="w-full max-w-64 md:max-w-40 sm:ml-2"
-        onClick={handleRequest} 
-      >
+        onClick={handleRequest}>
         Send Request
       </Button>
     </div>

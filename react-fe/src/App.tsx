@@ -4,11 +4,14 @@ import RequestBody, { JsonCode } from "./components/sections/RequestBody";
 import ResponseBody from "./components/sections/ResponseBody";
 import UrlHolder from "./components/sections/UrlHolder";
 import axios from "axios";
+import { hasProtocol } from "./utils/helpers/regex";
 
 const App = () => {
   const [loading, setLoading] = useState(false);
   const [jsonCode, setJsonCode] = useState<string>("{\n\t\n}");
-  const [response, setResponse] = useState<JsonCode>({"Your response will appear...": "Here!"});
+  const [response, setResponse] = useState<JsonCode>({
+    "Your response will appear...": "Here!",
+  });
   const [url, setUrl] = useState(
     "https://jsonplaceholder.typicode.com/posts/1"
   );
@@ -19,6 +22,13 @@ const App = () => {
     setLoading(true);
     try {
       const realJson = JSON.parse(jsonCode as string);
+      const hasHttpProtocol = hasProtocol(url);
+
+      if (!hasHttpProtocol) {
+        setUrl("http://" + url); // Add http:// protocol if not present 
+      } else {
+        setUrl(url); // Otherwise, set the URL as it is
+      }
       console.log("URL:", url);
       console.log("Method:", selectedMethod);
       console.log("Request Body:", realJson);
@@ -47,7 +57,7 @@ const App = () => {
   };
   useEffect(() => {
     console.log("Updated Response:", response);
-  }, [response, url, loading]);
+  }, [response, loading]);
   return (
     <Layout className="px-4">
       <UrlHolder
