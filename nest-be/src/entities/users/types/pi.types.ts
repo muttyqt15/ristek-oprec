@@ -14,8 +14,8 @@ export enum PengurusIntiRole {
 }
 
 export enum AuthorityLevelPI {
-  ADMIN = 'admin', // PO, VPO, KOOR ACARA -> Can create, read, update, delete acara,
-  NORMAL = 'normal', // REST -> Can read, update acara
+  ADMIN = 'Admin', // PO, VPO, KOOR ACARA -> Can create, read, update, delete acara,
+  NORMAL = 'Normal', // REST -> Can read, update acara
 }
 
 export const adminTypes: PengurusIntiRole[] = [

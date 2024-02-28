@@ -1,7 +1,7 @@
 export enum MainRole {
-  BPH = 'bph',
-  PI = 'pi',
-  NON_STAFF = 'non staff',
+  BPH = 'BPH',
+  PI = 'PI',
+  NON_STAFF = 'NON STAFF',
 }
 
 // export enum GlobalAuthorityLevel {

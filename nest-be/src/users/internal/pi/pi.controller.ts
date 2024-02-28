@@ -11,13 +11,15 @@ import {
 } from '@nestjs/common';
 import { PiService } from './pi.service';
 import { CreatePiDto, UpdatePIDto } from './pi.dto';
-import { UserAuth } from 'src/auth/strategies/userAuth.guard';
+import { UserAuth } from 'src/auth/jwtguards/userAuth.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { MainRole } from 'src/entities/users/types/entity.types';
+import { RoleGuard } from 'src/auth/roles/role.guard';
 
 @Controller('pi')
 export class PiController {
   constructor(private readonly piService: PiService) {}
 
-  @UseGuards(UserAuth)
   @Get()
   async getAllPengurusInti() {
     try {
@@ -37,6 +39,8 @@ export class PiController {
     }
   }
 
+  @Roles(MainRole.PI)
+  @UseGuards(UserAuth, RoleGuard)
   @Post()
   async createPengurusInti(@Body() createPiDto: CreatePiDto) {
     try {

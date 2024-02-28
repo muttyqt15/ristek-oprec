@@ -10,7 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthDto } from './auth.dto';
 import { Request } from 'express';
-import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { AccessTokenGuard } from 'src/auth/jwtguards/accessToken.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,5 +33,13 @@ export class AuthController {
       code: HttpStatus.OK,
       message: `${req.user['role']} user has successfully logged out! ${req.user['subject']}`,
     };
+  }
+
+  @Get('refresh')
+  refreshTokens(@Req() req: Request) {
+    const userId = req.user['subject'];
+    const userRole = req.user['role'];
+    const refreshToken = req.user['refreshToken'];
+    return this.authService.refreshTokens(userId, refreshToken, userRole);
   }
 }

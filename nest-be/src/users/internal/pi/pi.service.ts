@@ -94,4 +94,13 @@ export class PiService {
     }
     return status;
   }
+
+  async findById(id: number) {
+    try {
+      const pi = await this.pengurusIntiRepository.findOne({ where: { id } });
+      return pi;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
