@@ -1,6 +1,6 @@
 import { AuthDto } from 'src/auth/auth.dto';
-import { CreateBPHParams } from 'src/users/internal/bph/bph.types';
-import { CreatePIParams } from 'src/users/internal/pi/pi.types';
+import { CreateBPHParams } from 'src/modules/internal/bph/bph.types';
+import { CreatePIParams } from 'src/modules/internal/pi/types';
 
 export function isCreateBPHParams(dto: AuthDto): dto is CreateBPHParams {
   return (dto as CreateBPHParams).divisi !== undefined;

@@ -10,7 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthDto } from './auth.dto';
 import { Request } from 'express';
-import { AccessTokenGuard } from 'src/auth/jwtguards/accessToken.guard';
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 
 @Controller('auth')
 export class AuthController {

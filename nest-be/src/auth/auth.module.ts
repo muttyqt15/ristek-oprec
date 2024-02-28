@@ -3,8 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import strategies from './strategies';
-import { PiModule } from 'src/users/internal/pi/pi.module';
-import { BphModule } from 'src/users/internal/bph/bph.module';
+import { BphModule } from 'src/modules/internal/bph/bph.module';
+import { PiModule } from 'src/modules/internal/pi/pi.module';
 
 @Module({
   imports: [JwtModule.register({}), PiModule, BphModule],

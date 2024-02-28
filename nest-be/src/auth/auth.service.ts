@@ -6,15 +6,15 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PiService } from 'src/users/internal/pi/pi.service';
 import { AuthDto } from './auth.dto';
-import { BphService } from 'src/users/internal/bph/bph.service';
-import { CreateBPHParams } from 'src/users/internal/bph/bph.types';
-import { CreatePIParams } from 'src/users/internal/pi/pi.types';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { matchPassword } from 'src/utils/hash';
 import { isCreateBPHParams, isCreatePIParams } from 'src/utils/isType';
 import * as bcrypt from 'bcrypt';
+import { CreatePIParams } from 'src/modules/internal/pi/types';
+import { CreateBPHParams } from 'src/modules/internal/bph/bph.types';
+import { PiService } from 'src/modules/internal/pi/pi.service';
+import { BphService } from 'src/modules/internal/bph/bph.service';
 export type CreateParams<T extends MainRole.PI | MainRole.BPH> =
   T extends MainRole.PI ? CreatePIParams : CreateBPHParams;
 
