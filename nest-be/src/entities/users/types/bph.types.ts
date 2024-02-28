@@ -20,7 +20,7 @@ export enum DivisiBPH {
   VISUAL_DESIGN_DAN_DOKUMENTASI = 'visual design dan dokumentasi',
 }
 
-export enum AuthorityLevelBPH {
+export enum BPH_ROLE {
   PJ = 'penanggung jawab',
   WAPJ = 'wakil penanggung jawab',
   STAFF = 'staff',

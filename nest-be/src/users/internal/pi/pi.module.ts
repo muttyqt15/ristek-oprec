@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([PengurusInti])],
   providers: [PiService],
   controllers: [PiController],
+  exports: [PiService],
 })
 export class PiModule {}

@@ -13,21 +13,28 @@ export class PiService {
     private readonly pengurusIntiRepository: Repository<PengurusInti>,
   ) {}
 
-  async getAllPengurusInti() {
+  async getAllUser() {
     return await this.pengurusIntiRepository.find();
   }
 
+  async getByName(name: string) {
+    return await this.pengurusIntiRepository.findOne({ where: { name: name } });
+  }
+
   // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
-  async createPengurusInti(bodyDetails: CreatePIParams) {
+  async create(bodyDetails: CreatePIParams) {
+    console.log('Hi!');
     try {
       const existingPI = await this.pengurusIntiRepository.find({
         where: {
           pi_role: bodyDetails.pi_role,
         },
       });
+      console.log('Hello!');
+      console.log(existingPI, existingPI.length);
       if (existingPI.length > 0) {
         throw new HttpException(
-          'Users with the same role already exist',
+          'Users with the same role already exist?!',
           HttpStatus.CONFLICT,
         );
       }
@@ -57,7 +64,7 @@ export class PiService {
       }
     }
   }
-  async updatePengurusInti(pi_id: number, updateDetails: UpdatePIDto) {
+  async update(pi_id: number, updateDetails: UpdatePIDto) {
     try {
       const updatedPi = await this.pengurusIntiRepository.update(
         { id: pi_id },
@@ -78,7 +85,7 @@ export class PiService {
       );
     }
   }
-  async deleteAllPI() {
+  async deleteAll() {
     let status = false;
     try {
       await this.pengurusIntiRepository.delete({});

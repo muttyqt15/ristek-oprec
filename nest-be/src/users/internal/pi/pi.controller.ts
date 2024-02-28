@@ -18,7 +18,7 @@ export class PiController {
   @Get()
   async getAllPengurusInti() {
     try {
-      const totalPI = await this.piService.getAllPengurusInti();
+      const totalPI = await this.piService.getAllUser();
       return {
         code: HttpStatus.OK,
         message: 'Found all Pengurus Inti OKK!',
@@ -37,7 +37,7 @@ export class PiController {
   @Post()
   async createPengurusInti(@Body() createPiDto: CreatePiDto) {
     try {
-      const newUser = await this.piService.createPengurusInti(createPiDto);
+      const newUser = await this.piService.create(createPiDto);
       return {
         code: HttpStatus.CREATED,
         message: `${createPiDto.pi_role} created successfully!`,
@@ -57,7 +57,7 @@ export class PiController {
     @Param('id') id: number,
     @Body() updateUserDto: UpdatePIDto,
   ) {
-    await this.piService.updatePengurusInti(id, updateUserDto);
+    await this.piService.update(id, updateUserDto);
     return {
       code: HttpStatus.OK,
       message: `Successfully updated Pengurus Inti with ID of ${id}, ${updateUserDto.name}`,
@@ -65,7 +65,7 @@ export class PiController {
   }
   @Delete()
   async deleteAllPengurusInti() {
-    const deleteStatus = await this.piService.deleteAllPI();
+    const deleteStatus = await this.piService.deleteAll();
     if (deleteStatus) {
       return {
         code: HttpStatus.OK,

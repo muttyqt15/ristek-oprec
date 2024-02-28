@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { User } from '../User';
 import { MainRole } from '../types/entity.types';
-import { AuthorityLevelBPH, DivisiBPH } from '../types/bph.types';
+import { BPH_ROLE, DivisiBPH } from '../types/bph.types';
 
 @Entity({ name: 'anggota_bph' })
 export class AnggotaBPH extends User {
@@ -21,8 +21,8 @@ export class AnggotaBPH extends User {
 
   @Column({
     type: 'enum',
-    enum: AuthorityLevelBPH,
-    default: AuthorityLevelBPH.STAFF,
+    enum: BPH_ROLE,
+    default: BPH_ROLE.STAFF,
   })
-  authority_level: AuthorityLevelBPH;
+  bph_role: BPH_ROLE;
 }

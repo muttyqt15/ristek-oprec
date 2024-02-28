@@ -1,10 +1,6 @@
-import { MainRole } from 'src/entities/users/types/entity.types';
 import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
+import { BaseUser } from 'src/users/types/BaseUser.type';
 
-export type CreatePIParams = {
-  name: string;
-  batch: number;
-  password: string;
-  role: MainRole;
+export interface CreatePIParams extends BaseUser {
   pi_role: PengurusIntiRole;
-};
+}
