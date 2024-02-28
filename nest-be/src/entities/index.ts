@@ -1,9 +1,20 @@
 import { Acara } from './other/Acara';
 import { GroupOKK } from './other/GroupOKK';
 import { Mentee } from './users/external/Mentee';
+import { Speaker } from './users/external/Speaker';
+import { Sponsor } from './users/external/Sponsor';
 import { AnggotaBPH } from './users/panitia/AnggotaBPH';
 import { Mentor } from './users/panitia/Mentor';
 import { PengurusInti } from './users/panitia/PengurusInti';
 
-const entities = [AnggotaBPH, PengurusInti, Acara, Mentor, Mentee, GroupOKK];
+const entities = [
+  AnggotaBPH,
+  PengurusInti,
+  Acara,
+  Mentor,
+  Mentee,
+  GroupOKK,
+  Sponsor,
+  Speaker,
+];
 export default entities;

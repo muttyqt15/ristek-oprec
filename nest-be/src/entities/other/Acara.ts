@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { AcaraImportance } from './types';
+import { Sponsor } from '../users/external/Sponsor';
+import { Speaker } from '../users/external/Speaker';
 
 @Entity({ name: 'acara' })
 export class Acara {
@@ -15,11 +23,19 @@ export class Acara {
   @Column() // in hours
   duration: number;
 
-  @Column()
-  in_progress: boolean;
+  @Column({ default: false })
+  in_progress?: boolean;
 
   @Column({ type: 'enum', enum: AcaraImportance, default: AcaraImportance.LOW })
-  importance: AcaraImportance;
+  importance?: AcaraImportance;
+
+  @ManyToMany(() => Sponsor, { nullable: true })
+  @JoinTable() // Only on this side
+  sponsors?: Sponsor[];
+
+  @ManyToMany(() => Speaker, { nullable: true })
+  @JoinTable() // Only on this side
+  speakers?: Speaker[];
 
   // @Column('simple-array', {
   //   nullable: true,
