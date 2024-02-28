@@ -23,7 +23,6 @@ export class PiService {
 
   // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
   async create(bodyDetails: CreatePIParams) {
-    console.log('Hi!');
     try {
       const existingPI = await this.pengurusIntiRepository.find({
         where: {

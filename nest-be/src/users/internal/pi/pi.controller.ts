@@ -7,14 +7,17 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { PiService } from './pi.service';
 import { CreatePiDto, UpdatePIDto } from './pi.dto';
+import { UserAuth } from 'src/auth/strategies/userAuth.guard';
 
 @Controller('pi')
 export class PiController {
   constructor(private readonly piService: PiService) {}
 
+  @UseGuards(UserAuth)
   @Get()
   async getAllPengurusInti() {
     try {

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -11,11 +12,12 @@ import { BphService } from 'src/users/internal/bph/bph.service';
 import { CreateBPHParams } from 'src/users/internal/bph/bph.types';
 import { CreatePIParams } from 'src/users/internal/pi/pi.types';
 import { MainRole } from 'src/entities/users/types/entity.types';
-import { hashPassword } from 'src/utils/hash';
+import { matchPassword } from 'src/utils/hash';
 import { isCreateBPHParams, isCreatePIParams } from 'src/utils/isType';
 import * as bcrypt from 'bcrypt';
 export type CreateParams<T extends MainRole.PI | MainRole.BPH> =
   T extends MainRole.PI ? CreatePIParams : CreateBPHParams;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,12 +25,13 @@ export class AuthService {
     private readonly bphService: BphService,
     private readonly jwtService: JwtService,
   ) {}
-  async getTokens(userId: number, username: string) {
+  async getTokens(userId: number, username: string, userRole: MainRole) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           subject: userId,
-          username,
+          username: username,
+          role: userRole,
         },
         {
           secret: process.env.JWT_ACCESS_SECRET,
@@ -38,7 +41,8 @@ export class AuthService {
       this.jwtService.signAsync(
         {
           subject: userId,
-          username,
+          username: username,
+          role: userRole,
         },
         {
           secret: process.env.JWT_REFRESH_SECRET,
@@ -53,41 +57,81 @@ export class AuthService {
     };
   }
 
-  async hashData(data: string) {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(data, salt);
-  }
-  async updateRefreshToken(
-    userId: string,
-    refreshToken: string,
-    role: MainRole,
-  ) {
-    const hashedRefreshToken = await this.hashData(refreshToken);
+  getService(role) {
     let service;
     if (role === MainRole.BPH) {
       service = this.bphService;
     } else if (role === MainRole.PI) {
       service = this.piService;
     } else {
-      return 'Dunno';
+      return 'NON_STAFF IMPLEMENTATION';
     }
+    return service;
+  }
 
-    console.log(role);
+  async logOut(userId: string, role: MainRole) {
+    const service = this.getService(role);
+    return service.update(userId, { refreshToken: null });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string, role: MainRole) {
+    const service = this.getService(role);
+    const user = await service.findById(userId);
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access Denied');
+    const refreshTokenMatches = await matchPassword(
+      user.refreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
+    const tokens = await this.getTokens(user.id, user.username, user.role);
+    await this.updateRefreshToken(user.id, tokens.refreshToken, user.role);
+    return tokens;
+  }
+
+  async hashData(data: string) {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(data, salt);
+  }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+    role: MainRole,
+  ) {
+    const hashedRefreshToken = await this.hashData(refreshToken);
+    const service = this.getService(role);
     await service.update(userId, { refreshToken: hashedRefreshToken });
   }
 
-  async signUp(
-    createUserDto: AuthDto,
-    // role: T,
-  ) {
+  async logIn(userData: AuthDto) {
+    const service = this.getService(userData.role);
+    const user = await service.getByName(userData.name);
+    if (!userData) throw new BadRequestException('User does not exist');
+    console.log(user);
+    const passwordMatches = await matchPassword(
+      userData.password,
+      user.password,
+    );
+    console.log(userData.password, user.password);
+    console.log(await bcrypt.compare(userData.password, user.password));
+    if (!passwordMatches)
+      throw new BadRequestException('Password is incorrect');
+    const tokens = await this.getTokens(user.id, user.name, user.role);
+    await this.updateRefreshToken(user.id, tokens.refreshToken, user.role);
+    return {
+      message: 'Successfully logged in!',
+      tokens: tokens,
+    };
+  }
+  // Hashing password twice will cause incorrect comparisons
+  async signUp(createUserDto: AuthDto) {
     let service: PiService | BphService;
     switch (createUserDto.role) {
-      // If PI, set dto to PI object and use PI service
       case MainRole.PI:
         service = this.piService;
         createUserDto = { ...createUserDto } as CreatePIParams;
         break;
-      // If BPH, set dto to BPH object and use BPH service
       case MainRole.BPH:
         service = this.bphService;
         createUserDto = { ...createUserDto } as CreateBPHParams;
@@ -102,26 +146,24 @@ export class AuthService {
     if (existingUser) {
       throw new BadRequestException('User already exists');
     }
-    const hashedPassword = await hashPassword(createUserDto.password);
+
     let newUser;
 
-    // Mungkin juga bisa check createUserDto.rol
     if (isCreateBPHParams(createUserDto)) {
       console.log('Is BPH');
       newUser = await this.bphService.create({
         ...(createUserDto as CreateBPHParams),
-        password: hashedPassword,
       });
     } else if (isCreatePIParams(createUserDto)) {
       console.log('Is PI');
       newUser = await this.piService.create({
         ...(createUserDto as CreatePIParams),
-        password: hashedPassword,
       });
     } else {
       throw new HttpException('Something..? NON_STAFF', 500);
     }
-    const tokens = await this.getTokens(newUser.id, newUser.name);
+
+    const tokens = await this.getTokens(newUser.id, newUser.name, newUser.role);
     await this.updateRefreshToken(
       newUser.id,
       tokens.refreshToken,
