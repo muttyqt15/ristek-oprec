@@ -30,11 +30,11 @@ export class Acara {
   importance?: AcaraImportance;
 
   @ManyToMany(() => Sponsor, { nullable: true })
-  @JoinTable() // Only on this side
+  @JoinTable({ name: 'sponsor_acara' }) // Only on this side
   sponsors?: Sponsor[];
 
   @ManyToMany(() => Speaker, { nullable: true })
-  @JoinTable() // Only on this side
+  @JoinTable({ name: 'speaker_acara' }) // Only on this side
   speakers?: Speaker[];
 
   // @Column('simple-array', {
