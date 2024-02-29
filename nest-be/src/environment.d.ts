@@ -5,5 +5,7 @@ declare module NodeJS {
     MYSQL_DB_PASSWORD: string;
     MYSQL_DB_PORT: string;
     MYSQL_DB_NAME: string;
+    JWT_ACCESS_SECRET: string;
+    JWT_REFRESH_SECRET: string;
   }
 }

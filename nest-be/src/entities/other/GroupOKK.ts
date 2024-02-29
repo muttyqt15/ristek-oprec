@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -14,13 +15,13 @@ export class GroupOKK {
   id: number;
 
   @Column({ unique: true })
-  group_number: number;
+  group_name: string;
 
-  @OneToOne(() => Mentor)
+  @OneToOne(() => Mentor, (mentor) => mentor.group_okk)
   @JoinColumn() // Set on only one side of relation
   mentor: Mentor;
 
-  @OneToOne(() => Mentee)
+  @OneToMany(() => Mentee, (mentee) => mentee.group_okk)
   @JoinColumn()
-  mentee: Mentee;
+  mentee: Mentee[];
 }

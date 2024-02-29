@@ -14,6 +14,9 @@ export class BphService {
     private readonly bphRepository: Repository<AnggotaBPH>,
   ) {}
 
+  async findById(id: number) {
+    return await this.bphRepository.findOne({ where: { id } });
+  }
   async getAllUser() {
     return await this.bphRepository.find({
       select: {
@@ -59,6 +62,7 @@ export class BphService {
         password: hashedPassword,
         role: bodyDetails.role,
         divisi: bodyDetails.divisi,
+        bph_role: bodyDetails.bph_role,
       });
       return await this.bphRepository.save(newBPH);
     } catch (err) {

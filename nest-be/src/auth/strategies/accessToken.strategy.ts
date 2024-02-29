@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { MainRole } from 'src/entities/users/types/entity.types';
-import { OKK_Mentoring } from 'src/entities/users/types/okk.types';
-export type ControlRoles = MainRole | BPH_ROLE | OKK_Mentoring;
+import { ControlRoles } from '../auth.service';
 
-type JwtPayload = {
+export type JwtPayload = {
   subject: string;
   username: string;
   role: MainRole;
+  extraRoles: ControlRoles;
 };
 
 @Injectable()

@@ -102,7 +102,10 @@ export class PiService {
 
   async findById(id: number) {
     try {
-      const pi = await this.pengurusIntiRepository.findOne({ where: { id } });
+      const pi = await this.pengurusIntiRepository.findOne({
+        where: { id },
+        select: { name: true, batch: true, role: true, pi_role: true },
+      });
       return pi;
     } catch (error) {
       console.error(error);

@@ -1,10 +1,15 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { User } from '../User';
-import { Mentor } from '../panitia/Mentor';
+import { GroupOKK } from 'src/entities/other/GroupOKK';
+import { MainRole } from '../types/entity.types';
 @Entity({ name: 'mentee' })
 export class Mentee extends User {
   @Column()
   jalur_masuk: string; // Could also be an enum
-  @ManyToOne(() => Mentor, (mentor) => mentor.mentee, { nullable: true })
-  mentor?: Mentor;
+
+  @Column({ default: MainRole.NON_STAFF, nullable: true })
+  role: MainRole.NON_STAFF;
+
+  @ManyToOne(() => GroupOKK, (group) => group.mentee, { nullable: true })
+  group_okk?: GroupOKK;
 }

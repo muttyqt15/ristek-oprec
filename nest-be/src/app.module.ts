@@ -7,6 +7,7 @@ import { PiModule } from './modules/internal/pi/pi.module';
 import { AcaraModule } from './modules/external/acara/acara.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './modules/users.module';
+import { MentoringModule } from './modules/external/mentoring/mentoring.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users.module';
     BphModule,
     PiModule,
     AcaraModule,
+    MentoringModule,
     AuthModule,
     UsersModule,
   ],

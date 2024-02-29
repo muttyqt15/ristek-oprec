@@ -9,30 +9,62 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BphService } from './bph.service';
 import { UserAuth } from 'src/auth/guards/userAuth.guard';
 import { MainRoleGuard } from 'src/auth/guards/role.guard';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { CreateBPHDto, UpdateBPHDto } from './bph.dto';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { ExtraRoles, Roles } from 'src/auth/roles/roles.decorator';
+import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
 
+@ApiTags('BPH') // Add a tag for the controller
 @Controller('bph')
 export class BphController {
   constructor(private readonly bphService: BphService) {}
 
+  @ApiOperation({ summary: 'Get all BPH members' }) // Operation metadata
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns all BPH members',
+  }) // Response metadata
   @Get()
   async getAllBPH() {
     return await this.bphService.getAllUser();
   }
 
-  @Roles(MainRole.PI)
+  @ApiBearerAuth() // Authentication metadata
+  @ApiOperation({ summary: 'Delete all BPH members (Only for PI and PO)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All BPH members deleted successfully',
+  })
+  @Roles(MainRole.PI) // Authorization metadata
+  @ExtraRoles(PengurusIntiRole.PO)
   @UseGuards(UserAuth, MainRoleGuard)
   @Delete()
   async deleteAllBph() {
     return await this.bphService.deleteAll();
   }
 
-  @Roles(MainRole.PI)
+  @ApiBearerAuth() // Authentication metadata
+  @ApiOperation({ summary: 'Create a new BPH member' })
+  @ApiBody({ type: CreateBPHDto }) // Request body metadata
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'New BPH member created successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to create BPH member',
+  })
+  @Roles(MainRole.PI) // Authorization metadata
   @UseGuards(UserAuth, MainRoleGuard)
   @Post()
   async createAnggotaBPH(@Body() createBPHDto: CreateBPHDto) {
@@ -53,7 +85,18 @@ export class BphController {
     }
   }
 
-  @Roles(MainRole.PI, MainRole.BPH)
+  @ApiBearerAuth() // Authentication metadata
+  @ApiOperation({ summary: 'Update a BPH member' })
+  @ApiBody({ type: UpdateBPHDto }) // Request body metadata
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'BPH member updated successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to update BPH member',
+  })
+  @Roles(MainRole.PI, MainRole.BPH) // Authorization metadata
   @UseGuards(UserAuth, MainRoleGuard)
   @Patch(':id')
   async updateAnggotaBPH(

@@ -1,11 +1,16 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { User } from '../User';
-import { Mentee } from '../external/Mentee';
+import { GroupOKK } from 'src/entities/other/GroupOKK';
 
 @Entity({ name: 'mentor' })
 export class Mentor extends User {
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   interests?: string[];
-  @OneToMany(() => Mentee, (mentee) => mentee.mentor, { nullable: true })
-  mentee?: Mentee[];
+
+  // Group column doesn't need to be define JOIN COLUMN
+  @OneToOne(() => GroupOKK, (groupOKK) => groupOKK.mentor)
+  group_okk: GroupOKK;
+
+  // @OneToMany(() => Mentee, (mentee) => mentee.mentor, { nullable: true })
+  // mentee?: Mentee[];
 }
