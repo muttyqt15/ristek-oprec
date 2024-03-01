@@ -2,9 +2,10 @@ export enum MainRole {
   BPH = 'BPH',
   PI = 'PI',
   NON_STAFF = 'NON STAFF',
-  BPH_ADMIN = 'BPH ADMIN',
   MENTOR = 'MENTOR',
   SPONSOR = 'SPONSOR',
+  SPEAKER = 'SPEAKER',
+  SUPER_ADMIN = 'SUPER ADMIN',
 }
 
 // export enum GlobalAuthorityLevel {

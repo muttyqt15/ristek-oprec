@@ -5,18 +5,36 @@ import {
   Get,
   HttpStatus,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { MentoringService } from './mentoring.service';
 import { GroupOKKDto } from './dtos/groupokk.dto';
 import { BaseUserDto } from 'src/modules/types/BaseUser.dto';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { CreateMentorDto } from './dtos/mentor.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { MainRoleGuard } from 'src/auth/guards/role.guard';
+import { UserAuth } from 'src/auth/guards/userAuth.guard';
 
+@Roles(MainRole.MENTOR, MainRole.SUPER_ADMIN)
+@ApiTags('MENTORING')
 @Controller('mentoring')
 export class MentoringController {
   constructor(private readonly mentoringService: MentoringService) {}
 
-  // Group endpoints
+  @ApiOperation({
+    summary: 'Get all groups - Public',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully retrieved all groups!',
+  })
   @Get('group')
   async getAllGroups() {
     const allGroups = await this.mentoringService.findAllGroups();
@@ -26,6 +44,15 @@ export class MentoringController {
       groups: allGroups,
     };
   }
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create OKK group - Only for mentors',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully created new group!',
+  })
+  @UseGuards(UserAuth, MainRoleGuard)
   @Post('group')
   async createGroupOKK(@Body() createGroupDto: GroupOKKDto) {
     const { group_name, menteeIds, mentorId } = createGroupDto;
@@ -40,7 +67,15 @@ export class MentoringController {
       group: group,
     };
   }
-
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete all OKK groupss - Only for mentors',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully deleted all groups!',
+  })
+  @UseGuards(UserAuth, MainRoleGuard)
   @Delete('group')
   async deleteAllGroupOKK() {
     return await this.mentoringService.deleteAllGroups();
@@ -67,7 +102,14 @@ export class MentoringController {
       mentors: mentors,
     };
   }
-
+  @ApiOperation({
+    summary: 'Creates mentee OKK entity - MENTOR',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully created mentee!',
+  })
+  @UseGuards(UserAuth, MainRoleGuard)
   @Post('mentee')
   async createMenteeOKK(
     @Body() createMenteeDto: BaseUserDto & { jalur_masuk: string },
@@ -79,6 +121,13 @@ export class MentoringController {
     };
   }
 
+  @ApiOperation({
+    summary: 'Finds all mentees from all groups - Public',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully found all mentees!',
+  })
   @Get('mentee')
   async findAllMentee() {
     const allMentees = await this.mentoringService.findAllMentee();

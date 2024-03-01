@@ -20,8 +20,7 @@ import { RapatModule } from './modules/internal/bph/rapat/rapat.module';
       password: 'mySQLpsw123.',
       database: 'okk_forge',
       entities: entities,
-      synchronize: true, // Commented out because this causes an infinite loop and keeps trying to create tables on many to many entities
-      // dropSchema: true,
+      synchronize: true, // TypeORM doesn't support database names that have capital letters
     }),
     BphModule,
     PiModule,

@@ -1,10 +1,9 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
-import { MainRoleGuard } from 'src/auth/guards/role.guard';
+import { ApiTags } from '@nestjs/swagger';
 import { UserAuth } from 'src/auth/guards/userAuth.guard';
-import { Roles } from 'src/auth/roles/roles.decorator';
-import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { hashPassword, matchPassword } from 'src/utils/hash';
 
+@ApiTags('TESTING')
 @Controller('users')
 export class UsersController {
   @Post('hash')

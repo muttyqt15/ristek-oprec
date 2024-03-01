@@ -231,6 +231,7 @@ export class AcaraService {
   async createAcara(acaraDetails: CreateAcaraParams) {
     const existingAcara = await this.acaraRepository.findOne({
       where: { nama_acara: acaraDetails.nama_acara },
+      relations: ['sponsors', 'speakers'],
     });
     if (existingAcara) {
       throw new HttpException(
@@ -244,13 +245,16 @@ export class AcaraService {
 
   // Get all events
   async getAllAcara() {
-    return await this.acaraRepository.find({});
+    return await this.acaraRepository.find({
+      relations: ['sponsors', 'speakers'],
+    });
   }
 
   // Get an event by ID
   async getAcaraById(acaraId: number) {
     const acara = await this.acaraRepository.findOne({
       where: { id: acaraId },
+      relations: ['sponsors', 'speakers'],
     });
     if (!acara) {
       throw new HttpException('Event not found', HttpStatus.NOT_FOUND);

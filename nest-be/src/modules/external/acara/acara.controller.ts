@@ -18,22 +18,25 @@ import { UserAuth } from 'src/auth/guards/userAuth.guard';
 import { MainRoleGuard } from 'src/auth/guards/role.guard';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
 @ApiTags('ACARA')
+@Roles(MainRole.SUPER_ADMIN)
 @Controller('acara')
 export class AcaraController {
   constructor(private readonly acaraService: AcaraService) {}
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create OKK Event' })
+  @ApiOperation({ summary: 'Create OKK Event - PI' })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully created OKK event',
   })
+  @ApiBody({ type: CreateAcaraDto })
   @Roles(MainRole.PI)
   @UseGuards(UserAuth, MainRoleGuard)
   @Post()
@@ -64,7 +67,7 @@ export class AcaraController {
   }
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update OKK Event' })
+  @ApiOperation({ summary: 'Update OKK Event - PI, BPH' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated OKK event',
@@ -84,7 +87,7 @@ export class AcaraController {
     };
   }
 
-  @ApiOperation({ summary: 'Get All OKK Events' })
+  @ApiOperation({ summary: 'Get All OKK Events - PUBLIC' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully retrieved all OKK events',
@@ -94,7 +97,7 @@ export class AcaraController {
     return await this.acaraService.getAllAcara();
   }
 
-  @ApiOperation({ summary: 'Get OKK Event by ID' })
+  @ApiOperation({ summary: 'Get OKK Event by ID - PUBLIC' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully retrieved OKK event by ID',

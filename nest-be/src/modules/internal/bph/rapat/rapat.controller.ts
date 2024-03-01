@@ -16,6 +16,7 @@ import { UserAuth } from 'src/auth/guards/userAuth.guard';
 import { MainRoleGuard } from 'src/auth/guards/role.guard';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -25,17 +26,21 @@ import { CreateRapatDto } from './rapat.dto';
 import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { ExtraRoleGuard } from 'src/auth/roles/extraRoles.guard';
 
-@ApiTags('Rapat')
-@Controller('Rapat')
+@ApiTags('RAPAT')
+@Roles(MainRole.SUPER_ADMIN)
+@Controller('rapat')
 export class RapatController {
   constructor(private readonly rapatService: RapatService) {}
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create rapat' })
+  @ApiOperation({
+    summary: 'Create rapat - Only PJ and WAPJ in BPH can access',
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully created BPH Rapat',
   })
+  @ApiBody({ type: CreateRapatDto })
   @Roles(MainRole.BPH)
   @ExtraRoles(BPH_ROLE.PJ, BPH_ROLE.WAPJ)
   @UseGuards(UserAuth, MainRoleGuard, ExtraRoleGuard)
@@ -50,7 +55,7 @@ export class RapatController {
   }
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete BPH Rapat' })
+  @ApiOperation({ summary: 'Delete BPH Rapat - Only PJ and WAPJ can access' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully deleted BPH Rapat',
@@ -68,7 +73,7 @@ export class RapatController {
   }
 
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update BPH Rapat' })
+  @ApiOperation({ summary: 'Update BPH Rapat - Any PI and BPH can access' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully updated BPH Rapat',
@@ -88,12 +93,17 @@ export class RapatController {
     };
   }
 
-  @ApiOperation({ summary: 'Get All BPH Rapats' })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get All BPH Rapats - Any PI, BPH, MENTOR, can access',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully retrieved all BPH Rapats',
   })
   @Get()
+  @Roles(MainRole.BPH, MainRole.MENTOR, MainRole.PI)
+  @UseGuards(MainRoleGuard)
   async getAllRapats() {
     const rapats = await this.rapatService.getAllRapat();
     return {
@@ -102,11 +112,16 @@ export class RapatController {
     };
   }
 
-  @ApiOperation({ summary: 'Get BPH Rapat by ID' })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get BPH Rapat by ID - Any PI, BPH, MENTOR can access',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully retrieved BPH Rapat by ID',
   })
+  @Roles(MainRole.BPH, MainRole.MENTOR, MainRole.PI)
+  @UseGuards(MainRoleGuard)
   @Get(':id')
   async getRapat(@Param('id') id: number) {
     return await this.rapatService.getRapatById(id);

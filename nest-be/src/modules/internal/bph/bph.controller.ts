@@ -25,6 +25,7 @@ import { ExtraRoles, Roles } from 'src/auth/roles/roles.decorator';
 import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
 
 @ApiTags('BPH') // Add a tag for the controller
+@Roles(MainRole.SUPER_ADMIN)
 @Controller('bph')
 export class BphController {
   constructor(private readonly bphService: BphService) {}

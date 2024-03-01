@@ -15,7 +15,15 @@ import { Roles } from 'src/auth/roles/roles.decorator';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { UserAuth } from 'src/auth/guards/userAuth.guard';
 import { MainRoleGuard } from 'src/auth/guards/role.guard';
-
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+@ApiTags('PENGURUS INTI')
+@Roles(MainRole.SUPER_ADMIN)
 @Controller('pi')
 export class PiController {
   constructor(private readonly piService: PiService) {}
@@ -38,8 +46,16 @@ export class PiController {
       };
     }
   }
-
-  @Roles(MainRole.PI)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create pengurus inti - SUPER ADMIN',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully created Pengurus Inti',
+  })
+  @ApiBody({ type: CreatePiDto })
+  @Roles(MainRole.SUPER_ADMIN)
   @UseGuards(UserAuth, MainRoleGuard)
   @Post()
   async createPengurusInti(@Body() createPiDto: CreatePiDto) {
@@ -59,6 +75,14 @@ export class PiController {
       };
     }
   }
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update pengurus inti - PI',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully updated Pengurus Inti',
+  })
   @Patch(':id')
   async updatePengurusInti(
     @Param('id') id: number,
@@ -70,6 +94,15 @@ export class PiController {
       message: `Successfully updated Pengurus Inti with ID of ${id}, ${updateUserDto.name}`,
     };
   }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Deleted pengurus inti - PI',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully deleted Pengurus Inti',
+  })
   @Delete()
   async deleteAllPengurusInti() {
     const deleteStatus = await this.piService.deleteAll();

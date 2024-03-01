@@ -4,8 +4,8 @@ import { AnggotaBPH } from 'src/entities/users/panitia/AnggotaBPH';
 import { Repository } from 'typeorm';
 import { CreateBPHParams } from './bph.types';
 import { hashPassword } from 'src/utils/hash';
-import { UpdateBPHDto } from './bph.dto';
 import { BPH_ROLE, DivisiBPH } from 'src/entities/users/types/bph.types';
+import { CreateBPHDto } from './bph.dto';
 
 @Injectable()
 export class BphService {
@@ -112,7 +112,7 @@ export class BphService {
       }
     }
   }
-  async update(BPH_id: number, updateDetails: UpdateBPHDto) {
+  async update(BPH_id: number, updateDetails: Partial<CreateBPHDto>) {
     try {
       const updatedBPH = await this.bphRepository.update(
         { id: BPH_id },

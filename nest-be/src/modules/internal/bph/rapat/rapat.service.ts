@@ -18,10 +18,9 @@ export class RapatService {
     const { list_hadir_ids } = rapatDetails;
     const bph_list: AnggotaBPH[] = []; // Initialize bph_list as an empty array
 
-    // Using Promise.all() to asynchronously fetch all AnggotaBPH entities
     await Promise.all(
       list_hadir_ids.map(async (id) => {
-        const bph = await this.bphService.findById(id); // Wait for the promise to resolve
+        const bph = await this.bphService.findById(id);
         if (bph) {
           // Ensure that the entity is retrieved successfully
           bph_list.push(bph); // Push the retrieved AnggotaBPH entity into bph_list
@@ -31,8 +30,8 @@ export class RapatService {
         }
       }),
     );
-    console.log('Frombph list!', bph_list);
-    const Rapat = await this.rapatRepository.create({ // Sesat cok eslint hrsnya await emg diperlukan
+    const Rapat = await this.rapatRepository.create({
+      // Sesat cok eslint hrsnya await emg diperlukan
       ...rapatDetails,
       list_hadir: bph_list,
     });
