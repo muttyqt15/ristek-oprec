@@ -28,5 +28,5 @@ export class AnggotaBPH extends User {
   bph_role: BPH_ROLE;
 
   @ManyToMany(() => Rapat, (rapat) => rapat.list_hadir, { nullable: true })
-  rapat_dihadiri?: Rapat[];
+  rapat_dihadiri: Rapat[];
 }

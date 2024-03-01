@@ -15,5 +15,5 @@ export class Mentee extends User {
   group_okk?: GroupOKK;
 
   @ManyToOne(() => Mentor, (mentor) => mentor.mentee, { nullable: true })
-  mentor: Mentor;
+  mentor?: Mentor;
 }

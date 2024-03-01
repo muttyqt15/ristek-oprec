@@ -32,7 +32,7 @@ export class RapatService {
       }),
     );
     console.log('Frombph list!', bph_list);
-    const Rapat = this.rapatRepository.create({
+    const Rapat = await this.rapatRepository.create({ // Sesat cok eslint hrsnya await emg diperlukan
       ...rapatDetails,
       list_hadir: bph_list,
     });
@@ -41,13 +41,14 @@ export class RapatService {
 
   // Get all Rapats
   async getAllRapat() {
-    return await this.rapatRepository.find({});
+    return await this.rapatRepository.find({ relations: ['list_hadir'] });
   }
 
   // Get an Rapat by ID
   async getRapatById(RapatId: number) {
     const Rapat = await this.rapatRepository.findOne({
       where: { id: RapatId },
+      relations: ['list_hadir'], // Includes list_hadir relation
     });
     if (!Rapat) {
       throw new HttpException('Rapat not found', HttpStatus.NOT_FOUND);
