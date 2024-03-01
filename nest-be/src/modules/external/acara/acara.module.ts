@@ -10,5 +10,6 @@ import { Speaker } from 'src/entities/users/external/Speaker';
   imports: [TypeOrmModule.forFeature([Acara, Sponsor, Speaker])],
   providers: [AcaraService],
   controllers: [AcaraController],
+  exports: [AcaraService],
 })
 export class AcaraModule {}

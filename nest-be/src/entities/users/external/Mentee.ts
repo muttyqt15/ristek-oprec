@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { User } from '../User';
 import { GroupOKK } from 'src/entities/other/GroupOKK';
 import { MainRole } from '../types/entity.types';
+import { Mentor } from '../panitia/Mentor';
 @Entity({ name: 'mentee' })
 export class Mentee extends User {
   @Column()
@@ -12,4 +13,7 @@ export class Mentee extends User {
 
   @ManyToOne(() => GroupOKK, (group) => group.mentee, { nullable: true })
   group_okk?: GroupOKK;
+
+  @ManyToOne(() => Mentor, (mentor) => mentor.mentee, { nullable: true })
+  mentor: Mentor;
 }

@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { DivisiBPH } from '../users/types/bph.types';
 import { AnggotaBPH } from '../users/panitia/AnggotaBPH';
 
@@ -6,6 +12,9 @@ import { AnggotaBPH } from '../users/panitia/AnggotaBPH';
 export class Rapat {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  rapat_name: string;
 
   @Column()
   divisi: DivisiBPH;
@@ -16,6 +25,10 @@ export class Rapat {
   @Column()
   location: string;
 
-  @Column()
-  list_hadir: AnggotaBPH[];
+  @Column({ nullable: true, default: 'important stuff!' })
+  agenda?: string;
+
+  @ManyToMany(() => AnggotaBPH, { nullable: true })
+  @JoinTable({ name: 'anggotalist_rapatlist' })
+  list_hadir?: AnggotaBPH[];
 }

@@ -8,6 +8,7 @@ import { AcaraModule } from './modules/external/acara/acara.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './modules/users.module';
 import { MentoringModule } from './modules/external/mentoring/mentoring.module';
+import { RapatModule } from './modules/internal/bph/rapat/rapat.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -19,7 +20,8 @@ import { MentoringModule } from './modules/external/mentoring/mentoring.module';
       password: 'mySQLpsw123.',
       database: 'okk_forge',
       entities: entities,
-      synchronize: true,
+      synchronize: true, // Commented out because this causes an infinite loop and keeps trying to create tables on many to many entities
+      // dropSchema: true,
     }),
     BphModule,
     PiModule,
@@ -27,6 +29,7 @@ import { MentoringModule } from './modules/external/mentoring/mentoring.module';
     MentoringModule,
     AuthModule,
     UsersModule,
+    RapatModule,
   ],
   controllers: [],
   providers: [],

@@ -34,11 +34,9 @@ export class PiService {
           pi_role: bodyDetails.pi_role,
         },
       });
-      console.log('Hello!');
-      console.log(existingPI, existingPI.length);
       if (existingPI.length > 0) {
         throw new HttpException(
-          'Users with the same role already exist?!',
+          'Pengurus Inti with the same role already exist?!',
           HttpStatus.CONFLICT,
         );
       }

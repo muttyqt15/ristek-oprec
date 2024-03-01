@@ -6,7 +6,7 @@ import { AnggotaBPH } from 'src/entities/users/panitia/AnggotaBPH';
 import { RapatModule } from './rapat/rapat.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AnggotaBPH]), RapatModule],
+  imports: [TypeOrmModule.forFeature([AnggotaBPH])],
   controllers: [BphController],
   providers: [BphService],
   exports: [BphService],

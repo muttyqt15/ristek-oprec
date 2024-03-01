@@ -1,5 +1,6 @@
 import { Acara } from './other/Acara';
 import { GroupOKK } from './other/GroupOKK';
+import { Rapat } from './other/Rapat';
 import { Mentee } from './users/external/Mentee';
 import { Speaker } from './users/external/Speaker';
 import { Sponsor } from './users/external/Sponsor';
@@ -16,5 +17,6 @@ const entities = [
   GroupOKK,
   Sponsor,
   Speaker,
+  Rapat,
 ];
 export default entities;

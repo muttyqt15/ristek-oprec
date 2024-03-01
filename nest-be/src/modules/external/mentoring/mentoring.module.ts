@@ -10,5 +10,6 @@ import { Mentee } from 'src/entities/users/external/Mentee';
   controllers: [MentoringController],
   providers: [MentoringService],
   imports: [TypeOrmModule.forFeature([GroupOKK, Mentor, Mentee])],
+  exports: [MentoringService],
 })
 export class MentoringModule {}

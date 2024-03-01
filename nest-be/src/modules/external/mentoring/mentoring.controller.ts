@@ -9,10 +9,14 @@ import {
 import { MentoringService } from './mentoring.service';
 import { GroupOKKDto } from './dtos/groupokk.dto';
 import { BaseUserDto } from 'src/modules/types/BaseUser.dto';
+import { MainRole } from 'src/entities/users/types/entity.types';
+import { CreateMentorDto } from './dtos/mentor.dto';
 
 @Controller('mentoring')
 export class MentoringController {
   constructor(private readonly mentoringService: MentoringService) {}
+
+  // Group endpoints
   @Get('group')
   async getAllGroups() {
     const allGroups = await this.mentoringService.findAllGroups();
@@ -41,12 +45,26 @@ export class MentoringController {
   async deleteAllGroupOKK() {
     return await this.mentoringService.deleteAllGroups();
   }
+
+  // Mentor endpoints
   @Post('mentor')
-  async createMentorOKK(@Body() createMentorDto: BaseUserDto) {
-    const mentor = await this.mentoringService.createMentor(createMentorDto);
+  async createMentorOKK(@Body() createMentorDto: CreateMentorDto) {
+    const mentor = await this.mentoringService.createMentor({
+      ...createMentorDto,
+      role: MainRole.MENTOR,
+    });
     return {
       mentor: mentor,
       message: `Successfully created ${createMentorDto.name}, our newest mentor!`,
+    };
+  }
+
+  @Get('mentor')
+  async getAllMentors() {
+    const mentors = await this.mentoringService.findAllMentors();
+    return {
+      message: 'Successfully found all mentors!',
+      mentors: mentors,
     };
   }
 

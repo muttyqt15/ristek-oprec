@@ -18,6 +18,10 @@ import { BphService } from 'src/modules/internal/bph/bph.service';
 import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { OKK_Mentoring } from 'src/entities/users/types/okk.types';
 import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
+import { MentoringService } from 'src/modules/external/mentoring/mentoring.service';
+import { AcaraService } from 'src/modules/external/acara/acara.service';
+import { CreateMentorParams } from 'src/modules/external/mentoring/dtos/mentor.types';
+import { CreateMenteeParams } from 'src/modules/external/mentoring/dtos/mentee.types';
 
 export type ControlRoles = BPH_ROLE | OKK_Mentoring | PengurusIntiRole;
 export type ServiceType<T extends PiService | BphService> = T extends BphService
@@ -28,6 +32,8 @@ export class AuthService {
   constructor(
     private readonly piService: PiService,
     private readonly bphService: BphService,
+    private readonly mentoringService: MentoringService,
+    private readonly acaraService: AcaraService,
     private readonly jwtService: JwtService,
   ) {}
   async getTokens(
@@ -73,13 +79,15 @@ export class AuthService {
   }
 
   getService(role: MainRole) {
-    let service;
+    let service: any;
     if (role === MainRole.BPH) {
       service = this.bphService;
     } else if (role === MainRole.PI) {
       service = this.piService;
-    } else {
-      return 'NON_STAFF IMPLEMENTATION';
+    } else if (role === MainRole.NON_STAFF || role === MainRole.MENTOR) {
+      service = this.mentoringService;
+    } else if (role === MainRole.SPONSOR) {
+      service = this.acaraService;
     }
     return service;
   }
@@ -146,19 +154,37 @@ export class AuthService {
   }
 
   async updateRefreshToken(
-    userId: string,
+    userId: number,
     refreshToken: string,
     role: MainRole,
   ) {
     const hashedRefreshToken = await this.hashData(refreshToken); // Extra role will come from refreshToken logic
     const service = this.getService(role);
-    await service.update(userId, { refreshToken: hashedRefreshToken });
+    if (role == MainRole.BPH || role == MainRole.PI) {
+      await service.update(userId, { refreshToken: hashedRefreshToken });
+    } else if (role == MainRole.MENTOR) {
+      await this.mentoringService.updateMentor(userId, {
+        refreshToken: hashedRefreshToken,
+      });
+    } else if (role == MainRole.NON_STAFF) {
+      await this.mentoringService.updateMentor(userId, {
+        refreshToken: hashedRefreshToken,
+      });
+    }
   }
 
   async logIn(userData: AuthDto) {
     const service = this.getService(userData.role);
-    console.log(service);
-    const user = await service.getByName(userData.name);
+    let user: any;
+    if (userData.role == MainRole.NON_STAFF) {
+      user = await this.mentoringService.findMenteeByName(userData.name);
+    } else if (userData.role == MainRole.MENTOR) {
+      user = await this.mentoringService.findMentorByName(userData.name);
+    } else {
+      // PI AND BPH
+      user = await service.getByName(userData.name);
+    }
+
     if (!user) throw new BadRequestException('User does not exist');
     console.log(user);
     const passwordMatches = await matchPassword(
@@ -183,10 +209,10 @@ export class AuthService {
       tokens: tokens,
     };
   }
+
   // Hashing password twice will cause incorrect comparisons
   async signUp(createUserDto: AuthDto) {
-    let service: PiService | BphService;
-    console.log(createUserDto);
+    let service: any;
     switch (createUserDto.role) {
       case MainRole.PI:
         service = this.piService;
@@ -196,15 +222,46 @@ export class AuthService {
         service = this.bphService;
         createUserDto = { ...createUserDto } as CreateBPHParams;
         break;
+      case MainRole.MENTOR:
+        service = this.mentoringService;
+        createUserDto = { ...createUserDto } as CreateMentorParams;
+        break;
+      case MainRole.NON_STAFF:
+        console.log('Masuk');
+        service = this.mentoringService;
+        createUserDto = { ...createUserDto } as CreateMenteeParams;
+        break;
       default:
         throw new HttpException(
           'Invalid role specified!',
           HttpStatus.BAD_REQUEST,
         );
     }
-    const existingUser = await service.getByName(createUserDto.name);
-    if (existingUser) {
-      throw new BadRequestException('User already exists');
+    if (
+      createUserDto.role == MainRole.BPH ||
+      createUserDto.role == MainRole.PI
+    ) {
+      const existingUser = await service.getByName(createUserDto.name);
+      console.log('Existing user!', existingUser);
+
+      if (existingUser != null) {
+        throw new BadRequestException('User already exists');
+      }
+    } else if (createUserDto.role == MainRole.MENTOR) {
+      const existingUser = await this.mentoringService.findMentorByName(
+        createUserDto.name,
+      );
+      if (existingUser != null) {
+        throw new BadRequestException('Mentor already exists');
+      }
+    } else if (createUserDto.role == MainRole.NON_STAFF) {
+      const existingUser = await this.mentoringService.findMenteeByName(
+        createUserDto.name,
+      );
+      // console.log(existingUser);
+      if (existingUser != null) {
+        throw new BadRequestException('Mentee already exists');
+      }
     }
 
     let newUser;
@@ -217,6 +274,14 @@ export class AuthService {
     } else if (isCreatePIParams(createUserDto)) {
       newUser = await this.piService.create({
         ...(createUserDto as CreatePIParams),
+      });
+    } else if (createUserDto.role == MainRole.MENTOR) {
+      newUser = await this.mentoringService.createMentor({
+        ...(createUserDto as CreateMentorParams),
+      });
+    } else if (createUserDto.role == MainRole.NON_STAFF) {
+      newUser = await this.mentoringService.createMentee({
+        ...(createUserDto as CreateMenteeParams),
       });
     } else {
       throw new HttpException('Something..? NON_STAFF', 500);

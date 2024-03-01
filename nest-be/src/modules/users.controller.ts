@@ -22,8 +22,7 @@ export class UsersController {
     return { isMatch };
   }
 
-  @Roles(BPH_ROLE.STAFF)
-  @UseGuards(UserAuth, MainRoleGuard)
+  @UseGuards(UserAuth)
   @Get()
   protectedRoute() {
     return 'You have access!';

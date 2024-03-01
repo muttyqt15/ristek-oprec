@@ -15,7 +15,15 @@ export class BphService {
   ) {}
 
   async findById(id: number) {
-    return await this.bphRepository.findOne({ where: { id } });
+    return await this.bphRepository.findOne({
+      where: { id },
+      select: {
+        name: true,
+        batch: true,
+        divisi: true,
+        bph_role: true,
+      },
+    });
   }
   async getAllUser() {
     return await this.bphRepository.find({
@@ -39,7 +47,6 @@ export class BphService {
     return await this.bphRepository.findOne({ where: { name: name } });
   }
 
-  // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
   async create(bodyDetails: CreateBPHParams) {
     try {
       const existingBPH = await this.bphRepository.find({
@@ -49,9 +56,34 @@ export class BphService {
       });
       if (existingBPH.length > 0) {
         throw new HttpException(
-          'Users with the same role already exist',
+          'Users with the same role and name already exist',
           HttpStatus.CONFLICT,
         );
+      }
+
+      if (bodyDetails.bph_role === BPH_ROLE.PJ) {
+        const existingPJ = await this.bphRepository.find({
+          where: {
+            divisi: bodyDetails.divisi,
+            bph_role: BPH_ROLE.PJ,
+          },
+        });
+        if (existingPJ.length > 0) {
+          throw new HttpException('PJ already exists!', HttpStatus.CONFLICT);
+        }
+      } else if (bodyDetails.bph_role === BPH_ROLE.WAPJ) {
+        const existingPJ = await this.bphRepository.find({
+          where: {
+            divisi: bodyDetails.divisi,
+            bph_role: BPH_ROLE.WAPJ,
+          },
+        });
+        if (existingPJ.length > 1) {
+          throw new HttpException(
+            'Both Wakil PJ already exists!',
+            HttpStatus.CONFLICT,
+          );
+        }
       }
 
       // If no existing users with the same role, proceed with creating the new user
