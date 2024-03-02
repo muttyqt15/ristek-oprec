@@ -74,7 +74,7 @@ export class AcaraService {
         // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
-          'Error creating Anggota Speaker',
+          'Error creating Speaker...',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -90,18 +90,22 @@ export class AcaraService {
         updateDetails,
       );
       if (updatedSpeaker.affected === 0) {
-        throw new HttpException(
-          'Anggota Speaker not found',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException('Speaker not found', HttpStatus.NOT_FOUND);
       }
       return updatedSpeaker;
     } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Failed to update Anggota Speaker',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      // Handle specific errors separately
+      if (error instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw error;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(error);
+        throw new HttpException(
+          'Error updating speaker...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
   async deleteAllSpeaker() {
@@ -109,8 +113,18 @@ export class AcaraService {
     try {
       await this.speakerRepository.delete({});
       status = true;
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw error;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(error);
+        throw new HttpException(
+          'Error deleting speakers...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
     return status;
   }
@@ -122,28 +136,80 @@ export class AcaraService {
       });
       await this.speakerRepository.delete({ id: existingSpeaker.id });
     } catch (err) {
-      console.error(err);
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error deleting speaker...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
   // Sponsor services
   async findSponsorById(id: number) {
-    return await this.sponsorRepository.findOne({ where: { id } });
+    try {
+      return await this.sponsorRepository.findOne({ where: { id } });
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error creating sponsor...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
   async getAllSponsor() {
-    return await this.sponsorRepository.find({
-      select: {
-        brand_name: true,
-        paket_sponsor: true,
-      },
-    });
+    try {
+      return await this.sponsorRepository.find({
+        select: {
+          brand_name: true,
+          paket_sponsor: true,
+        },
+      });
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error retrieving sponsors...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   async getSponsorsByPaket(paket: PaketSponsor) {
-    return await this.sponsorRepository.find({
-      where: {
-        paket_sponsor: paket,
-      },
-    });
+    try {
+      return await this.sponsorRepository.find({
+        where: {
+          paket_sponsor: paket,
+        },
+      });
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error retrieving sponsors...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   async createSponsor(bodyDetails: CreateSponsorParams) {
@@ -176,7 +242,7 @@ export class AcaraService {
         // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
-          'Error creating Anggota sponsor',
+          'Error creating sponsor...',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -198,12 +264,18 @@ export class AcaraService {
         );
       }
       return updatedSponsor;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'Failed to update Anggota sponsor',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error creating sponsor...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
   async deleteAllSponsor() {
@@ -212,7 +284,17 @@ export class AcaraService {
       await this.sponsorRepository.delete({});
       status = true;
     } catch (err) {
-      console.error(err);
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error deleting sponsors...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
     return status;
   }
@@ -224,25 +306,48 @@ export class AcaraService {
       });
       await this.sponsorRepository.delete({ id: existingSponsor.id });
     } catch (err) {
-      console.error(err);
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error deleting sponsor...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
   }
   // Create an event
   async createAcara(acaraDetails: CreateAcaraParams) {
-    const existingAcara = await this.acaraRepository.findOne({
-      where: { nama_acara: acaraDetails.nama_acara },
-      relations: ['sponsors', 'speakers'],
-    });
-    if (existingAcara) {
-      throw new HttpException(
-        'There is already an event with the same name!',
-        HttpStatus.CONFLICT,
-      );
+    try {
+      const existingAcara = await this.acaraRepository.findOne({
+        where: { nama_acara: acaraDetails.nama_acara },
+        relations: ['sponsors', 'speakers'],
+      });
+      if (existingAcara) {
+        throw new HttpException(
+          'There is already an event with the same name!',
+          HttpStatus.CONFLICT,
+        );
+      }
+      const acara = this.acaraRepository.create(acaraDetails);
+      return await this.acaraRepository.save(acara);
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error creating event...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
-    const acara = this.acaraRepository.create(acaraDetails);
-    return await this.acaraRepository.save(acara);
   }
-
   // Get all events
   async getAllAcara() {
     return await this.acaraRepository.find({
@@ -252,38 +357,80 @@ export class AcaraService {
 
   // Get an event by ID
   async getAcaraById(acaraId: number) {
-    const acara = await this.acaraRepository.findOne({
-      where: { id: acaraId },
-      relations: ['sponsors', 'speakers'],
-    });
-    if (!acara) {
-      throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+    try {
+      const acara = await this.acaraRepository.findOne({
+        where: { id: acaraId },
+        relations: ['sponsors', 'speakers'],
+      });
+      if (!acara) {
+        throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+      }
+      return acara;
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error getting event...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
-    return acara;
   }
 
   // Update an event
   async updateAcara(acaraId: number, updateParams: Partial<CreateAcaraParams>) {
-    const existingAcara = await this.acaraRepository.findOne({
-      where: { id: acaraId },
-    });
-    if (!existingAcara) {
-      throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+    try {
+      const existingAcara = await this.acaraRepository.findOne({
+        where: { id: acaraId },
+      });
+      if (!existingAcara) {
+        throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+      }
+      await this.acaraRepository.update(acaraId, updateParams);
+      return await this.acaraRepository.findOne({
+        where: { id: acaraId },
+      });
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error updating event...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
-    await this.acaraRepository.update(acaraId, updateParams);
-    return await this.acaraRepository.findOne({
-      where: { id: acaraId },
-    });
   }
 
   async deleteAcaraById(acaraId: number) {
-    const existingAcara = await this.acaraRepository.findOne({
-      where: { id: acaraId },
-    });
-    if (!existingAcara) {
-      throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+    try {
+      const existingAcara = await this.acaraRepository.findOne({
+        where: { id: acaraId },
+      });
+      if (!existingAcara) {
+        throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+      }
+      await this.acaraRepository.delete(acaraId);
+      return existingAcara;
+    } catch (err) {
+      if (err instanceof HttpException) {
+        // If it's a known conflict error, rethrow the same error
+        throw err;
+      } else {
+        // If it's an unexpected error, throw a generic server error
+        console.error(err);
+        throw new HttpException(
+          'Error getting event...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
-    await this.acaraRepository.delete(acaraId);
-    return existingAcara;
   }
 }

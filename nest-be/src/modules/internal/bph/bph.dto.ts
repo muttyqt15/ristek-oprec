@@ -1,4 +1,5 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator'; // Import validators as per your requirements
+import { PartialType } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty } from 'class-validator'; // Import validators as per your requirements
 import { BPH_ROLE, DivisiBPH } from 'src/entities/users/types/bph.types';
 import { BaseUserDto } from 'src/modules/types/BaseUser.dto';
 
@@ -12,10 +13,4 @@ export class CreateBPHDto extends BaseUserDto {
   bph_role: BPH_ROLE;
 }
 
-export class UpdateBPHDto {
-  @IsNotEmpty()
-  @IsString()
-  name?: string;
-  divisi?: DivisiBPH;
-  bph_role?: BPH_ROLE;
-}
+export class UpdateBPHDto extends PartialType(CreateBPHDto) {}
