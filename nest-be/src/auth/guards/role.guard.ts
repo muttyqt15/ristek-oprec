@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { OKK_Mentoring } from 'src/entities/users/types/okk.types';
+import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
 
 @Injectable()
 export class MainRoleGuard implements CanActivate {
@@ -10,8 +11,8 @@ export class MainRoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   checkRoles(
-    roles: (MainRole | BPH_ROLE | OKK_Mentoring)[],
-    userRole: (MainRole | BPH_ROLE | OKK_Mentoring)[],
+    roles: (MainRole | BPH_ROLE | OKK_Mentoring | PengurusIntiRole)[],
+    userRole: (MainRole | BPH_ROLE | OKK_Mentoring | PengurusIntiRole)[],
   ) {
     console.log(roles, userRole);
     // Checks if the context role (userRole) is in the required roles array

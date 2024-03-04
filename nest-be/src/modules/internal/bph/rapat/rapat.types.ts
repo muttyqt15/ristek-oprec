@@ -4,5 +4,5 @@ export type CreateRapatParams = {
   divisi: DivisiBPH;
   waktu: string; // "17:00"
   location: string;
-  list_hadir_ids: number[];
+  list_hadir_ids: number[]; // Will be used to later get actual AnggotaBPH objects
 };

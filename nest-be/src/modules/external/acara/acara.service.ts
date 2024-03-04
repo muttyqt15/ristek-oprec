@@ -7,7 +7,7 @@ import { PaketSponsor, Sponsor } from 'src/entities/users/external/Sponsor';
 import { Speaker } from 'src/entities/users/external/Speaker';
 import { hashPassword } from 'src/utils/hash';
 import { CreateSpeakerParams, CreateSponsorParams } from './types/types';
-import { CreateSponsorDto } from './dtos/CreateSponsor.dto';
+import { CreateSponsorDto } from './dtos/sponsor.dto';
 
 @Injectable()
 export class AcaraService {

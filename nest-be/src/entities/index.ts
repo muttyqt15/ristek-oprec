@@ -7,6 +7,7 @@ import { Sponsor } from './users/external/Sponsor';
 import { AnggotaBPH } from './users/panitia/AnggotaBPH';
 import { Mentor } from './users/panitia/Mentor';
 import { PengurusInti } from './users/panitia/PengurusInti';
+import { SuperAdmin } from './users/superAdmin';
 
 const entities = [
   AnggotaBPH,
@@ -18,5 +19,6 @@ const entities = [
   Sponsor,
   Speaker,
   Rapat,
+  SuperAdmin,
 ];
 export default entities;

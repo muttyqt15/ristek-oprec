@@ -46,12 +46,13 @@ export class MentoringController {
   }
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Create OKK group - Only for mentors',
+    summary: 'Create OKK group - MENTOR',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully created new group!',
   })
+  @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR)
   @UseGuards(UserAuth, MainRoleGuard)
   @Post('group')
   async createGroupOKK(@Body() createGroupDto: GroupOKKDto) {
@@ -69,12 +70,13 @@ export class MentoringController {
   }
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Delete all OKK groupss - Only for mentors',
+    summary: 'Delete all OKK groups - MENTOR',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successfully deleted all groups!',
   })
+  @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR)
   @UseGuards(UserAuth, MainRoleGuard)
   @Delete('group')
   async deleteAllGroupOKK() {
@@ -109,6 +111,7 @@ export class MentoringController {
     status: HttpStatus.OK,
     description: 'Successfully created mentee!',
   })
+  @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR)
   @UseGuards(UserAuth, MainRoleGuard)
   @Post('mentee')
   async createMenteeOKK(

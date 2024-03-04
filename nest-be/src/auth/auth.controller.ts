@@ -64,7 +64,7 @@ export class AuthController {
     await this.authService.logOut(req.user['subject'], req.user['role']);
     return {
       code: HttpStatus.OK,
-      message: `${req.user['role']} with id of ${req.user['subject']} has successfully logged out!}`,
+      message: `${req.user['role']} with id of ${req.user['subject']} has successfully logged out!`,
     };
   }
 

@@ -7,6 +7,7 @@ import { BphModule } from 'src/modules/internal/bph/bph.module';
 import { PiModule } from 'src/modules/internal/pi/pi.module';
 import { AcaraModule } from 'src/modules/external/acara/acara.module';
 import { MentoringModule } from 'src/modules/external/mentoring/mentoring.module';
+import { UsersModule } from 'src/modules/users.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MentoringModule } from 'src/modules/external/mentoring/mentoring.module
     BphModule,
     AcaraModule,
     MentoringModule,
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, ...strategies],

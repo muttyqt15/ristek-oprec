@@ -10,7 +10,7 @@ export class ExtraRoleGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     // Get required BPH_ROLES from context (decorator)
     const roles = this.reflector.get<BPH_ROLE[]>(
-      'bphRole',
+      'extraRole',
       context.getHandler(),
     );
     if (!roles) {

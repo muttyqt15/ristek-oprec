@@ -12,15 +12,3 @@ export enum PengurusIntiRole {
   KOORDINATOR_KREATIF = 'Koordinator Kreatif',
   KOORDINATOR_RELASI = 'Koordinator Relasi',
 }
-
-// export enum AuthorityLevelPI {
-//   ADMIN = 'Admin', // PO, VPO, KOOR ACARA -> Can create, read, update, delete acara,
-//   NORMAL = 'Normal', // REST -> Can read, update acara
-// }
-
-// export const adminTypes: PengurusIntiRole[] = [
-//   PengurusIntiRole.PO,
-//   PengurusIntiRole.VPO_EKSTERNAL,
-//   PengurusIntiRole.VPO_INTERNAL,
-//   PengurusIntiRole.KOORDINATOR_ACARA,
-// ];

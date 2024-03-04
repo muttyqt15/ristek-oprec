@@ -23,7 +23,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 @ApiTags('PENGURUS INTI')
-@Roles(MainRole.SUPER_ADMIN)
 @Controller('pi')
 export class PiController {
   constructor(private readonly piService: PiService) {}
@@ -83,6 +82,8 @@ export class PiController {
     status: HttpStatus.OK,
     description: 'Successfully updated Pengurus Inti',
   })
+  @Roles(MainRole.SUPER_ADMIN)
+  @UseGuards(UserAuth, MainRoleGuard)
   @Patch(':id')
   async updatePengurusInti(
     @Param('id') id: number,
@@ -103,6 +104,8 @@ export class PiController {
     status: HttpStatus.OK,
     description: 'Successfully deleted Pengurus Inti',
   })
+  @Roles(MainRole.SUPER_ADMIN)
+  @UseGuards(UserAuth, MainRoleGuard)
   @Delete()
   async deleteAllPengurusInti() {
     const deleteStatus = await this.piService.deleteAll();

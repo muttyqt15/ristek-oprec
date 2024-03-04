@@ -1,6 +1,7 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { DivisiBPH } from 'src/entities/users/types/bph.types';
+import { AnggotaBPH } from 'src/entities/users/panitia/AnggotaBPH';
 
 export class CreateRapatDto {
   @ApiProperty({
@@ -45,4 +46,9 @@ export class CreateRapatDto {
   })
   @IsNotEmpty()
   list_hadir_ids: number[];
+}
+
+export class UpdateRapatDto extends PartialType(CreateRapatDto) {
+  @IsOptional()
+  list_hadir?: AnggotaBPH[];
 }

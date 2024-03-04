@@ -23,7 +23,7 @@ export abstract class User {
   role: MainRole;
 
   @Column({ nullable: true })
-  refreshToken: string;
+  refreshToken?: string;
   // @Column({
   //   type: 'enum',
   //   enum: GlobalAuthorityLevel,

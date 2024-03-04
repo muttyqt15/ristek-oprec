@@ -24,8 +24,7 @@ import { CreateBPHDto, UpdateBPHDto } from './bph.dto';
 import { ExtraRoles, Roles } from 'src/auth/roles/roles.decorator';
 import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
 
-@ApiTags('BPH') // Add a tag for the controller
-@Roles(MainRole.SUPER_ADMIN)
+@ApiTags('BPH')
 @Controller('bph')
 export class BphController {
   constructor(private readonly bphService: BphService) {}
@@ -46,8 +45,8 @@ export class BphController {
     status: HttpStatus.OK,
     description: 'All BPH members deleted successfully',
   })
-  @Roles(MainRole.PI) // Authorization metadata
-  @ExtraRoles(PengurusIntiRole.PO)
+  @Roles(MainRole.SUPER_ADMIN, MainRole.PI) // Authorization metadata
+  @ExtraRoles(PengurusIntiRole.PO, PengurusIntiRole.VPO_INTERNAL)
   @UseGuards(UserAuth, MainRoleGuard)
   @Delete()
   async deleteAllBph() {
@@ -65,7 +64,7 @@ export class BphController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Failed to create BPH member',
   })
-  @Roles(MainRole.PI) // Authorization metadata
+  @Roles(MainRole.SUPER_ADMIN, MainRole.PI) // Authorization metadata
   @UseGuards(UserAuth, MainRoleGuard)
   @Post()
   async createAnggotaBPH(@Body() createBPHDto: CreateBPHDto) {
@@ -97,7 +96,7 @@ export class BphController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Failed to update BPH member',
   })
-  @Roles(MainRole.PI, MainRole.BPH) // Authorization metadata
+  @Roles(MainRole.SUPER_ADMIN, MainRole.PI, MainRole.BPH) // Authorization metadata
   @UseGuards(UserAuth, MainRoleGuard)
   @Patch(':id')
   async updateAnggotaBPH(

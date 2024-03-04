@@ -22,6 +22,8 @@ import { MentoringService } from 'src/modules/external/mentoring/mentoring.servi
 import { AcaraService } from 'src/modules/external/acara/acara.service';
 import { CreateMentorParams } from 'src/modules/external/mentoring/dtos/mentor.types';
 import { CreateMenteeParams } from 'src/modules/external/mentoring/dtos/mentee.types';
+import { UsersService } from 'src/modules/users.service';
+import { CreateSuperAdminDto } from 'src/entities/users/types/SuperAdmin.dto';
 
 export type ControlRoles = BPH_ROLE | OKK_Mentoring | PengurusIntiRole;
 export type ServiceType<T extends PiService | BphService> = T extends BphService
@@ -34,6 +36,7 @@ export class AuthService {
     private readonly bphService: BphService,
     private readonly mentoringService: MentoringService,
     private readonly acaraService: AcaraService,
+    private readonly superuserService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
   async getTokens(
@@ -86,14 +89,25 @@ export class AuthService {
       service = this.piService;
     } else if (role === MainRole.NON_STAFF || role === MainRole.MENTOR) {
       service = this.mentoringService;
-    } else if (role === MainRole.SPONSOR) {
-      service = this.acaraService;
+    } else if (role === MainRole.SUPER_ADMIN) {
+      service = this.superuserService;
     }
     return service;
   }
 
-  async logOut(userId: string, role: MainRole) {
+  async logOut(userId: number, role: MainRole) {
     const service = this.getService(role);
+    if (role == MainRole.SUPER_ADMIN) {
+      return this.superuserService.updateSuperadmin(userId, {
+        refreshToken: null,
+      });
+    } else if (role == MainRole.MENTOR) {
+      return this.mentoringService.updateMentor(userId, { refreshToken: null });
+    } else if (role == MainRole.NON_STAFF) {
+      return this.mentoringService.updateMentee(userId, { refreshToken: null });
+    } else {
+      console.log('Hmm!');
+    }
     return service.update(userId, { refreshToken: null });
   }
 
@@ -117,7 +131,7 @@ export class AuthService {
           extraRole = OKK_Mentoring.MENTEE;
           break;
         default:
-          console.log('Role not relevant yet..');
+          extraRole = undefined;
           break;
       }
     } catch (error) {
@@ -180,6 +194,8 @@ export class AuthService {
       user = await this.mentoringService.findMenteeByName(userData.name);
     } else if (userData.role == MainRole.MENTOR) {
       user = await this.mentoringService.findMentorByName(userData.name);
+    } else if (userData.role === MainRole.SUPER_ADMIN) {
+      user = await this.superuserService.findAdminByName(userData.name);
     } else {
       // PI AND BPH
       user = await service.getByName(userData.name);
@@ -213,6 +229,7 @@ export class AuthService {
   // Hashing password twice will cause incorrect comparisons
   async signUp(createUserDto: AuthDto) {
     let service: any;
+    console.log(createUserDto);
     switch (createUserDto.role) {
       case MainRole.PI:
         service = this.piService;
@@ -227,9 +244,12 @@ export class AuthService {
         createUserDto = { ...createUserDto } as CreateMentorParams;
         break;
       case MainRole.NON_STAFF:
-        console.log('Masuk');
         service = this.mentoringService;
         createUserDto = { ...createUserDto } as CreateMenteeParams;
+        break;
+      case MainRole.SUPER_ADMIN:
+        service = this.superuserService;
+        createUserDto = { ...createUserDto } as CreateSuperAdminDto;
         break;
       default:
         throw new HttpException(
@@ -245,14 +265,14 @@ export class AuthService {
       console.log('Existing user!', existingUser);
 
       if (existingUser != null) {
-        throw new BadRequestException('User already exists');
+        throw new BadRequestException('User with that name already exists');
       }
     } else if (createUserDto.role == MainRole.MENTOR) {
       const existingUser = await this.mentoringService.findMentorByName(
         createUserDto.name,
       );
       if (existingUser != null) {
-        throw new BadRequestException('Mentor already exists');
+        throw new BadRequestException('Mentor with that name already exists');
       }
     } else if (createUserDto.role == MainRole.NON_STAFF) {
       const existingUser = await this.mentoringService.findMenteeByName(
@@ -260,7 +280,7 @@ export class AuthService {
       );
       // console.log(existingUser);
       if (existingUser != null) {
-        throw new BadRequestException('Mentee already exists');
+        throw new BadRequestException('Mentee with that name already exists');
       }
     }
 
@@ -283,8 +303,13 @@ export class AuthService {
       newUser = await this.mentoringService.createMentee({
         ...(createUserDto as CreateMenteeParams),
       });
+    } else if (createUserDto.role === MainRole.SUPER_ADMIN) {
+      newUser = await this.superuserService.createSuperAdmin(createUserDto);
     } else {
-      throw new HttpException('Something..? NON_STAFF', 500);
+      return {
+        message: 'Unauthenticated role!',
+        user: createUserDto,
+      };
     }
 
     const extraRolePromise = this.checkExtraRoles(newUser.id, newUser.role);

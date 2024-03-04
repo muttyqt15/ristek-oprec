@@ -27,7 +27,6 @@ import { BPH_ROLE } from 'src/entities/users/types/bph.types';
 import { ExtraRoleGuard } from 'src/auth/roles/extraRoles.guard';
 
 @ApiTags('RAPAT')
-@Roles(MainRole.SUPER_ADMIN)
 @Controller('rapat')
 export class RapatController {
   constructor(private readonly rapatService: RapatService) {}
@@ -41,7 +40,7 @@ export class RapatController {
     description: 'Successfully created BPH Rapat',
   })
   @ApiBody({ type: CreateRapatDto })
-  @Roles(MainRole.BPH)
+  @Roles(MainRole.SUPER_ADMIN, MainRole.BPH)
   @ExtraRoles(BPH_ROLE.PJ, BPH_ROLE.WAPJ)
   @UseGuards(UserAuth, MainRoleGuard, ExtraRoleGuard)
   @Post()
@@ -60,7 +59,7 @@ export class RapatController {
     status: HttpStatus.OK,
     description: 'Successfully deleted BPH Rapat',
   })
-  @Roles(MainRole.BPH)
+  @Roles(MainRole.SUPER_ADMIN, MainRole.BPH)
   @ExtraRoles(BPH_ROLE.PJ, BPH_ROLE.WAPJ)
   @UseGuards(UserAuth, MainRoleGuard, ExtraRoleGuard)
   @Delete(':id')
@@ -78,7 +77,7 @@ export class RapatController {
     status: HttpStatus.OK,
     description: 'Successfully updated BPH Rapat',
   })
-  @Roles(MainRole.PI, MainRole.BPH)
+  @Roles(MainRole.SUPER_ADMIN, MainRole.PI, MainRole.BPH)
   @UseGuards(UserAuth, MainRoleGuard)
   @Patch(':id')
   async updateRapat(
@@ -101,9 +100,9 @@ export class RapatController {
     status: HttpStatus.OK,
     description: 'Successfully retrieved all BPH Rapats',
   })
+  @Roles(MainRole.SUPER_ADMIN, MainRole.BPH, MainRole.MENTOR, MainRole.PI)
+  @UseGuards(UserAuth, MainRoleGuard)
   @Get()
-  @Roles(MainRole.BPH, MainRole.MENTOR, MainRole.PI)
-  @UseGuards(MainRoleGuard)
   async getAllRapats() {
     const rapats = await this.rapatService.getAllRapat();
     return {
@@ -120,8 +119,8 @@ export class RapatController {
     status: HttpStatus.OK,
     description: 'Successfully retrieved BPH Rapat by ID',
   })
-  @Roles(MainRole.BPH, MainRole.MENTOR, MainRole.PI)
-  @UseGuards(MainRoleGuard)
+  @Roles(MainRole.SUPER_ADMIN, MainRole.BPH, MainRole.MENTOR, MainRole.PI)
+  @UseGuards(UserAuth, MainRoleGuard)
   @Get(':id')
   async getRapat(@Param('id') id: number) {
     return await this.rapatService.getRapatById(id);

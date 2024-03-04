@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { PaketSponsor } from 'src/entities/users/external/Sponsor';
 import { MainRole } from 'src/entities/users/types/entity.types';
@@ -15,3 +16,5 @@ export class CreateSponsorDto {
 
   role?: MainRole.SPONSOR;
 }
+
+export class UpdateSponsorDto extends PartialType(CreateSponsorDto) {}
