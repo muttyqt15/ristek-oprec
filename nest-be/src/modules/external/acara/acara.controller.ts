@@ -23,7 +23,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateSponsorDto, UpdateSponsorDto } from './dtos/sponsor.dto';
 
 @ApiTags('ACARA')
 @Controller('acara')
@@ -105,40 +104,5 @@ export class AcaraController {
   @Get(':id')
   async getAcara(@Param('id') id: number) {
     return await this.acaraService.getAcaraById(id);
-  }
-
-  @Get('sponsor')
-  async getSponsors() {
-    return await this.acaraService.getAllSponsor();
-  }
-
-  @Get('sponsor/:id')
-  async getSponsorById(@Param('id') id: number) {
-    return await this.acaraService.findSponsorById(id);
-  }
-
-  @Post('sponsor')
-  async createSponsor(@Body() createSponsorDto: CreateSponsorDto) {
-    return await this.acaraService.createSponsor(createSponsorDto);
-  }
-
-  @Patch('sponsor/:id')
-  async updateSponsor(
-    @Param('id') id: number,
-    @Body() updateSponsorDto: UpdateSponsorDto,
-  ) {
-    return await this.acaraService.updateSponsorById(id, updateSponsorDto);
-  }
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete sponsor - PI' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Successfully deleted sponsor',
-  })
-  @Roles(MainRole.SUPER_ADMIN, MainRole.PI)
-  @UseGuards(UserAuth, MainRoleGuard)
-  @Delete(':id')
-  async deleteSponsor(@Param('id') id: number) {
-    return await this.acaraService.deleteSponsorById(id);
   }
 }

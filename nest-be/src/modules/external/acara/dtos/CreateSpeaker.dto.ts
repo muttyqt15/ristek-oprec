@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { MainRole } from 'src/entities/users/types/entity.types';
 
 export class CreateSpeakerDto {
   @ApiProperty({
@@ -25,10 +24,8 @@ export class CreateSpeakerDto {
   speaker_code: string;
 
   @ApiProperty({
-    description: 'The role of the speaker',
-    enum: MainRole,
-    default: MainRole.SPEAKER,
-    example: MainRole.SPEAKER,
+    description: 'The current events the speaker is speaking in',
+    example: [1, 2],
   })
-  role?: MainRole.SPEAKER;
+  acaraIds: number[];
 }

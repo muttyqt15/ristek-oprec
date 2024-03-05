@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
 import { AcaraImportance } from 'src/entities/other/types';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -38,22 +32,6 @@ export class CreateAcaraDto {
     description: 'Indicates whether the event is currently in progress',
   })
   in_progress: boolean;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({
-    example: 'Sponsor brand',
-    description: 'The sponsor of the event',
-  })
-  sponsor?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({
-    example: 'Speaker Name',
-    description: 'The speaker of the event',
-  })
-  speaker?: string;
 
   @ApiProperty({
     example: 'MAX',

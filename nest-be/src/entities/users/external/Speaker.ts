@@ -1,5 +1,5 @@
-import { Acara } from 'src/entities/other/Acara';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { AcaraSpeakerSpokeIn } from './AcaraSpeakerSpokeIn';
 
 @Entity({ name: 'speaker' })
 export class Speaker {
@@ -12,9 +12,12 @@ export class Speaker {
   @Column()
   expert_field: string;
 
-  @Column()
+  @Column({ select: false })
   speaker_code: string;
 
-  @ManyToMany(() => Acara, (acara) => acara.speakers, { nullable: true })
-  acara?: Acara[];
+  @OneToMany(
+    () => AcaraSpeakerSpokeIn,
+    (acara_spoke_in) => acara_spoke_in.speaker,
+  )
+  acara_spoke_in: AcaraSpeakerSpokeIn[];
 }

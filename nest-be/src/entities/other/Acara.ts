@@ -1,13 +1,13 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  JoinColumn,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { AcaraSpeakerSpokeIn } from '../users/external/AcaraSpeakerSpokeIn';
+import { Sponsorship } from '../users/external/Sponsorship';
 import { AcaraImportance } from './types';
-import { Sponsor } from '../users/external/Sponsor';
-import { Speaker } from '../users/external/Speaker';
 
 @Entity({ name: 'acara' })
 export class Acara {
@@ -29,13 +29,19 @@ export class Acara {
   @Column({ type: 'enum', enum: AcaraImportance, default: AcaraImportance.LOW })
   importance?: AcaraImportance;
 
-  @ManyToMany(() => Sponsor, { nullable: true })
-  @JoinTable({ name: 'sponsor_acara' }) // Only on this side
-  sponsors?: Sponsor[];
+  // @ManyToMany(() => Speaker, { nullable: true })
+  // @JoinTable({ name: 'speaker_acara' }) // Only on this side
+  // speakers?: Speaker[];
+  @OneToMany(() => AcaraSpeakerSpokeIn, (assi) => assi.acara, {
+    nullable: true,
+  })
+  speakers_spoke_in?: AcaraSpeakerSpokeIn[];
 
-  @ManyToMany(() => Speaker, { nullable: true })
-  @JoinTable({ name: 'speaker_acara' }) // Only on this side
-  speakers?: Speaker[];
+  @OneToMany(() => Sponsorship, (sponsorship) => sponsorship.acara, {
+    nullable: true,
+  })
+  @JoinColumn()
+  sponsorships?: Sponsorship[];
 
   // @Column('simple-array', {
   //   nullable: true,

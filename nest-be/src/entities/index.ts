@@ -1,9 +1,11 @@
 import { Acara } from './other/Acara';
 import { GroupOKK } from './other/GroupOKK';
 import { Rapat } from './other/Rapat';
+import { AcaraSpeakerSpokeIn } from './users/external/AcaraSpeakerSpokeIn';
 import { Mentee } from './users/external/Mentee';
 import { Speaker } from './users/external/Speaker';
 import { Sponsor } from './users/external/Sponsor';
+import { Sponsorship } from './users/external/Sponsorship';
 import { AnggotaBPH } from './users/panitia/AnggotaBPH';
 import { Mentor } from './users/panitia/Mentor';
 import { PengurusInti } from './users/panitia/PengurusInti';
@@ -20,5 +22,7 @@ const entities = [
   Speaker,
   Rapat,
   SuperAdmin,
+  AcaraSpeakerSpokeIn,
+  Sponsorship,
 ];
 export default entities;

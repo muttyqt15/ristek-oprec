@@ -1,13 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Acara } from 'src/entities/other/Acara';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateAcaraParams } from './types';
 import { PaketSponsor, Sponsor } from 'src/entities/users/external/Sponsor';
 import { Speaker } from 'src/entities/users/external/Speaker';
 import { hashPassword } from 'src/utils/hash';
 import { CreateSpeakerParams, CreateSponsorParams } from './types/types';
-import { CreateSponsorDto } from './dtos/sponsor.dto';
+import { Sponsorship } from 'src/entities/users/external/Sponsorship';
+import { AcaraSpeakerSpokeIn } from 'src/entities/users/external/AcaraSpeakerSpokeIn';
 
 @Injectable()
 export class AcaraService {
@@ -18,6 +19,10 @@ export class AcaraService {
     private readonly sponsorRepository: Repository<Sponsor>,
     @InjectRepository(Speaker)
     private readonly speakerRepository: Repository<Speaker>,
+    @InjectRepository(Sponsorship)
+    private readonly sponsorshipRepository: Repository<Sponsorship>,
+    @InjectRepository(AcaraSpeakerSpokeIn)
+    private readonly acaraSpeakerRepository: Repository<AcaraSpeakerSpokeIn>,
   ) {}
 
   // Speaker services
@@ -26,9 +31,15 @@ export class AcaraService {
   }
   async getAllSpeaker() {
     return await this.speakerRepository.find({
+      relations: ['acara_spoke_in', 'acara_spoke_in.acara'],
       select: {
         name: true,
         expert_field: true,
+        acara_spoke_in: {
+          acara: {
+            nama_acara: true,
+          },
+        },
       },
     });
   }
@@ -41,7 +52,6 @@ export class AcaraService {
     });
   }
 
-  // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
   async createSpeaker(bodyDetails: CreateSpeakerParams) {
     try {
       const existingSpeaker = await this.speakerRepository.find({
@@ -51,27 +61,47 @@ export class AcaraService {
       });
       if (existingSpeaker.length > 0) {
         throw new HttpException(
-          `${bodyDetails.name} already exists in Speaker database`,
+          `${bodyDetails.name} already exists in speaker database!`,
           HttpStatus.CONFLICT,
         );
       }
 
       // If no existing users with the same role, proceed with creating the new user
       const hashedPassword = await hashPassword(bodyDetails.speaker_code);
-      const newSpeaker: CreateSpeakerParams =
-        await this.speakerRepository.create({
-          name: bodyDetails.name,
-          expert_field: bodyDetails.expert_field,
-          speaker_code: hashedPassword,
+      const acaraExists = await this.acaraRepository.find({
+        where: {
+          id: In(bodyDetails.acaraIds),
+        },
+        select: {
+          nama_acara: true,
+          importance: true,
+          location: true,
+        },
+      });
+      if (acaraExists.length == 0) {
+        throw new HttpException('No acara found!', HttpStatus.NOT_FOUND);
+      }
+      const newSpeaker: Speaker = this.speakerRepository.create({
+        name: bodyDetails.name,
+        expert_field: bodyDetails.expert_field,
+        speaker_code: hashedPassword,
+        acara_spoke_in: acaraExists,
+      });
+      // Save the speaker first before adding to it
+      await this.speakerRepository.save(newSpeaker);
+      for (const acara of acaraExists) {
+        const acaraSpeaker = this.acaraSpeakerRepository.create({
+          acara: acara,
+          speaker: newSpeaker,
         });
-      return await this.speakerRepository.save(newSpeaker);
+        await this.acaraSpeakerRepository.save(acaraSpeaker); // Simpan speaker acara relationship ke basis data
+      }
+      return newSpeaker;
     } catch (err) {
       // Handle specific errors separately
       if (err instanceof HttpException) {
-        // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error creating Speaker...',
@@ -99,7 +129,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw error;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(error);
         throw new HttpException(
           'Error updating speaker...',
@@ -107,26 +136,6 @@ export class AcaraService {
         );
       }
     }
-  }
-  async deleteAllSpeaker() {
-    let status = false;
-    try {
-      await this.speakerRepository.delete({});
-      status = true;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        // If it's a known conflict error, rethrow the same error
-        throw error;
-      } else {
-        // If it's an unexpected error, throw a generic server error
-        console.error(error);
-        throw new HttpException(
-          'Error deleting speakers...',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
-    return status;
   }
 
   async deleteSpeakerById(id: number) {
@@ -140,7 +149,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error deleting speaker...',
@@ -149,19 +157,21 @@ export class AcaraService {
       }
     }
   }
-  // Sponsor services
+  // // Sponsor services
   async findSponsorById(id: number) {
     try {
-      return await this.sponsorRepository.findOne({ where: { id } });
+      return await this.sponsorRepository.findOne({
+        where: { id },
+        relations: ['sponsorships'],
+      });
     } catch (err) {
       if (err instanceof HttpException) {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
-          'Error creating sponsor...',
+          'Error finding sponsor...',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -170,9 +180,10 @@ export class AcaraService {
   async getAllSponsor() {
     try {
       return await this.sponsorRepository.find({
+        relations: ['sponsorships'],
         select: {
           brand_name: true,
-          paket_sponsor: true,
+          sponsorships: true,
         },
       });
     } catch (err) {
@@ -180,7 +191,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error retrieving sponsors...',
@@ -194,7 +204,9 @@ export class AcaraService {
     try {
       return await this.sponsorRepository.find({
         where: {
-          paket_sponsor: paket,
+          sponsorships: {
+            package: paket,
+          },
         },
       });
     } catch (err) {
@@ -202,7 +214,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error retrieving sponsors...',
@@ -225,21 +236,40 @@ export class AcaraService {
           HttpStatus.CONFLICT,
         );
       }
+      const acaraExists = await this.acaraRepository.find({
+        where: {
+          id: In(bodyDetails.acaraIds),
+        },
+      });
+      if (acaraExists.length == 0) {
+        throw new HttpException('No acara found!', HttpStatus.NOT_FOUND);
+      }
 
       // If no existing users with the same role, proceed with creating the new user
       const hashedPassword = await hashPassword(bodyDetails.brand_code);
-      const newSponsor = await this.sponsorRepository.create({
+
+      const newSponsor = this.sponsorRepository.create({
         brand_name: bodyDetails.brand_name,
         brand_code: hashedPassword,
       });
-      return await this.sponsorRepository.save(newSponsor);
+      await this.sponsorRepository.save(newSponsor); // Simpan sponsor baru ke basis data
+
+      for (const acara of acaraExists) {
+        const sponsorship = this.sponsorshipRepository.create({
+          sponsor: newSponsor,
+          acara: acara,
+          package: bodyDetails.paket_sponsor,
+        });
+        await this.sponsorshipRepository.save(sponsorship); // Simpan sponsorship ke basis data
+      }
+
+      return newSponsor;
     } catch (err) {
       // Handle specific errors separately
       if (err instanceof HttpException) {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error creating sponsor...',
@@ -249,19 +279,16 @@ export class AcaraService {
     }
   }
   async updateSponsorById(
-    sponsor_id: number,
-    updateDetails: Partial<CreateSponsorDto>,
+    sponsorId: number,
+    updateDetails: Partial<CreateSponsorParams>,
   ) {
     try {
       const updatedSponsor = await this.sponsorRepository.update(
-        { id: sponsor_id },
+        { id: sponsorId },
         updateDetails,
       );
       if (updatedSponsor.affected === 0) {
-        throw new HttpException(
-          'Anggota sponsor not found',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException('Sponsor not found!', HttpStatus.NOT_FOUND);
       }
       return updatedSponsor;
     } catch (err) {
@@ -269,7 +296,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error creating sponsor...',
@@ -277,26 +303,6 @@ export class AcaraService {
         );
       }
     }
-  }
-  async deleteAllSponsor() {
-    let status = false;
-    try {
-      await this.sponsorRepository.delete({});
-      status = true;
-    } catch (err) {
-      if (err instanceof HttpException) {
-        // If it's a known conflict error, rethrow the same error
-        throw err;
-      } else {
-        // If it's an unexpected error, throw a generic server error
-        console.error(err);
-        throw new HttpException(
-          'Error deleting sponsors...',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
-    return status;
   }
 
   async deleteSponsorById(id: number) {
@@ -310,7 +316,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error deleting sponsor...',
@@ -324,7 +329,7 @@ export class AcaraService {
     try {
       const existingAcara = await this.acaraRepository.findOne({
         where: { nama_acara: acaraDetails.nama_acara },
-        relations: ['sponsors', 'speakers'],
+        relations: ['sponsorships', 'speakers_spoke_in'],
       });
       if (existingAcara) {
         throw new HttpException(
@@ -332,6 +337,7 @@ export class AcaraService {
           HttpStatus.CONFLICT,
         );
       }
+
       const acara = this.acaraRepository.create(acaraDetails);
       return await this.acaraRepository.save(acara);
     } catch (err) {
@@ -339,7 +345,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error creating event...',
@@ -351,7 +356,7 @@ export class AcaraService {
   // Get all events
   async getAllAcara() {
     return await this.acaraRepository.find({
-      relations: ['sponsors', 'speakers'],
+      relations: ['sponsorships', 'speakers_spoke_in'],
     });
   }
 
@@ -360,7 +365,11 @@ export class AcaraService {
     try {
       const acara = await this.acaraRepository.findOne({
         where: { id: acaraId },
-        relations: ['sponsors', 'speakers'],
+        relations: [
+          'sponsorships',
+          'sponsorships.sponsor',
+          'speakers_spoke_in',
+        ],
       });
       if (!acara) {
         throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
@@ -371,7 +380,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error getting event...',
@@ -399,7 +407,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error updating event...',
@@ -424,7 +431,6 @@ export class AcaraService {
         // If it's a known conflict error, rethrow the same error
         throw err;
       } else {
-        // If it's an unexpected error, throw a generic server error
         console.error(err);
         throw new HttpException(
           'Error getting event...',

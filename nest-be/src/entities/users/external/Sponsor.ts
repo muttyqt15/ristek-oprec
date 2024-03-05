@@ -1,6 +1,5 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { MainRole } from '../types/entity.types';
-import { Acara } from 'src/entities/other/Acara';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Sponsorship } from './Sponsorship';
 export enum PaketSponsor {
   PLATINUM = 'Platinum',
   GOLD = 'Gold',
@@ -15,15 +14,9 @@ export class Sponsor {
   brand_name: string;
 
   // Similiar to password
-  @Column()
+  @Column({ select: false })
   brand_code: string;
 
-  @Column()
-  paket_sponsor: PaketSponsor;
-
-  @ManyToMany(() => Acara, (acara) => acara.sponsors, { nullable: true })
-  acara?: Acara[];
-
-  @Column({ nullable: true, default: MainRole.SPONSOR })
-  role?: MainRole.SPONSOR;
+  @OneToMany(() => Sponsorship, (spship) => spship.sponsor)
+  sponsorships?: Sponsorship[];
 }
