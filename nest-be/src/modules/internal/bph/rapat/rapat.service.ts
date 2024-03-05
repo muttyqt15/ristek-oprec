@@ -57,7 +57,20 @@ export class RapatService {
 
   // Get all Rapats
   async getAllRapat() {
-    return await this.rapatRepository.find({ relations: ['list_hadir'] });
+    return await this.rapatRepository.find({
+      relations: ['list_hadir'],
+      select: {
+        id: true,
+        rapat_name: true,
+        agenda: true,
+        divisi: true,
+        list_hadir: {
+          id: true,
+          name: true,
+          bph_role: true,
+        },
+      },
+    });
   }
 
   // Get an Rapat by ID

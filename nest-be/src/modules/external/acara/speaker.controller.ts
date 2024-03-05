@@ -16,6 +16,7 @@ import { MainRole } from 'src/entities/users/types/entity.types';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -43,6 +44,7 @@ export class SpeakersController {
   })
   @Roles(MainRole.SUPER_ADMIN, MainRole.PI)
   @UseGuards(UserAuth, MainRoleGuard)
+  @ApiBody({ type: CreateSpeakerDto })
   @Post()
   async createSpeaker(@Body() createSpeakerDto: CreateSpeakerDto) {
     return await this.acaraService.createSpeaker(createSpeakerDto);

@@ -8,12 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MentoringService } from './mentoring.service';
-import { GroupOKKDto } from './dtos/groupokk.dto';
+import { CreateGroupOKKDto } from './dtos/groupokk.dto';
 import { BaseUserDto } from 'src/modules/types/BaseUser.dto';
 import { MainRole } from 'src/entities/users/types/entity.types';
 import { CreateMentorDto } from './dtos/mentor.dto';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -21,6 +22,7 @@ import {
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { MainRoleGuard } from 'src/auth/guards/role.guard';
 import { UserAuth } from 'src/auth/guards/userAuth.guard';
+import { CreateMenteeDto } from './dtos/mentee.dto';
 
 @Roles(MainRole.MENTOR, MainRole.SUPER_ADMIN)
 @ApiTags('MENTORING')
@@ -52,10 +54,11 @@ export class MentoringController {
     status: HttpStatus.CREATED,
     description: 'Successfully created new group!',
   })
+  @ApiBody({ type: CreateGroupOKKDto })
   @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR)
   @UseGuards(UserAuth, MainRoleGuard)
   @Post('group')
-  async createGroupOKK(@Body() createGroupDto: GroupOKKDto) {
+  async createGroupOKK(@Body() createGroupDto: CreateGroupOKKDto) {
     const { group_name, menteeIds, mentorId } = createGroupDto;
     console.log(createGroupDto);
     const group = await this.mentoringService.createGroup(
@@ -84,6 +87,17 @@ export class MentoringController {
   }
 
   // Mentor endpoints
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create mentor - PI, BPH, MENTOR',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully created mentor!',
+  })
+  @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR, MainRole.BPH, MainRole.PI)
+  @UseGuards(UserAuth, MainRoleGuard)
+  @ApiBody({ type: CreateMentorDto })
   @Post('mentor')
   async createMentorOKK(@Body() createMentorDto: CreateMentorDto) {
     const mentor = await this.mentoringService.createMentor({
@@ -113,6 +127,7 @@ export class MentoringController {
   })
   @Roles(MainRole.SUPER_ADMIN, MainRole.MENTOR)
   @UseGuards(UserAuth, MainRoleGuard)
+  @ApiBody({ type: CreateMenteeDto })
   @Post('mentee')
   async createMenteeOKK(
     @Body() createMenteeDto: BaseUserDto & { jalur_masuk: string },

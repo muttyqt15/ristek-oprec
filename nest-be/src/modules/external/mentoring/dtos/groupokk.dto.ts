@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty } from 'class-validator';
 
-export class GroupOKKDto {
+export class CreateGroupOKKDto {
   @ApiProperty({
     description: 'Name of OKK Group',
     example: 'Coolest OKK GROUP!',

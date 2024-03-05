@@ -18,6 +18,7 @@ export class BphService {
     const bph = await this.bphRepository.findOne({
       where: { id },
       select: {
+        id: true,
         name: true,
         batch: true,
         divisi: true,
@@ -32,9 +33,10 @@ export class BphService {
   async getAllUser() {
     return await this.bphRepository.find({
       select: {
+        id: true,
         name: true,
-        bph_role: true,
         divisi: true,
+        bph_role: true,
       },
     });
   }

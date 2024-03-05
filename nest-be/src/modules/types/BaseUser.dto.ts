@@ -35,14 +35,16 @@ export class BaseUserDto {
   @IsString()
   password: string;
   @ApiProperty({
-    description: 'Role of user',
-    example: MainRole,
+    description:
+      'Role of user - IMPORTANT! SESUAIIN SAMA ROLE YANG ANDA BIKIN! PI jadi role ini PI, BPH, jadi BPH etc',
+    example: MainRole.BPH,
   })
   @IsEnum(MainRole)
   role: MainRole;
 
   @ApiProperty({
-    description: 'Refresh token for auth',
+    description: 'Refresh token for auth, nullable',
+    nullable: true,
     example: 'likeAReallyHashedToken!',
   })
   refreshToken?: string;

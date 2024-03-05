@@ -28,7 +28,7 @@ export class Rapat {
   @Column({ nullable: true, default: 'important stuff!' })
   agenda?: string;
 
-  @ManyToMany(() => AnggotaBPH)
+  @ManyToMany(() => AnggotaBPH, (bph) => bph.rapat_dihadiri)
   @JoinTable({ name: 'anggotalist_rapatlist' })
   list_hadir: AnggotaBPH[];
 }
