@@ -2,18 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { description } from './utils/description';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('/okk/api');
 
-  const description = `
-  Welcome to **OKK Forge**! 
-
-  **OKK Forge** was built extensively with completely functional endpoints, entities, and is capable of all the operations in managing OKK! 
-
-  With role-based authentication with roles like *BPH*, *PI*, *MENTEE*, and more, **OKK Forge** is a safe place to manage OKK!
-  `;
   const config = new DocumentBuilder()
     .setTitle('OKK Forge Docs')
     .setDescription(description)

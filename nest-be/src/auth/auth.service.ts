@@ -25,7 +25,11 @@ import { CreateMenteeParams } from 'src/modules/external/mentoring/dtos/mentee.t
 import { UsersService } from 'src/modules/users.service';
 import { CreateSuperAdminDto } from 'src/entities/users/types/SuperAdmin.dto';
 
-export type ControlRoles = BPH_ROLE | OKK_Mentoring | PengurusIntiRole;
+export type ControlRoles =
+  | BPH_ROLE
+  | OKK_Mentoring
+  | PengurusIntiRole
+  | MainRole.SUPER_ADMIN;
 export type ServiceType<T extends PiService | BphService> = T extends BphService
   ? PiService
   : BphService;
@@ -130,6 +134,9 @@ export class AuthService {
         case MainRole.NON_STAFF:
           extraRole = OKK_Mentoring.MENTEE;
           break;
+        case MainRole.SUPER_ADMIN:
+          extraRole = MainRole.SUPER_ADMIN;
+          break;
         default:
           extraRole = undefined;
           break;
@@ -189,6 +196,7 @@ export class AuthService {
 
   async logIn(userData: AuthDto) {
     const service = this.getService(userData.role);
+    console.log(userData);
     let user: any;
     if (userData.role == MainRole.NON_STAFF) {
       user = await this.mentoringService.findMenteeByName(userData.name);
@@ -200,15 +208,13 @@ export class AuthService {
       // PI AND BPH
       user = await service.getByName(userData.name);
     }
-
-    if (!user) throw new BadRequestException('User does not exist');
+    console.log('suer');
     console.log(user);
+    if (!user) throw new BadRequestException('User does not exist');
     const passwordMatches = await matchPassword(
       userData.password,
       user.password,
     );
-    console.log(userData.password, user.password);
-    console.log(await bcrypt.compare(userData.password, user.password));
     if (!passwordMatches)
       throw new BadRequestException('Password is incorrect');
     const extraRolesPromise = this.checkExtraRoles(user.id, user.role);
@@ -229,7 +235,6 @@ export class AuthService {
   // Hashing password twice will cause incorrect comparisons
   async signUp(createUserDto: AuthDto) {
     let service: any;
-    console.log(createUserDto);
     switch (createUserDto.role) {
       case MainRole.PI:
         service = this.piService;
@@ -262,7 +267,6 @@ export class AuthService {
       createUserDto.role == MainRole.PI
     ) {
       const existingUser = await service.getByName(createUserDto.name);
-      console.log('Existing user!', existingUser);
 
       if (existingUser != null) {
         throw new BadRequestException('User with that name already exists');
@@ -278,9 +282,15 @@ export class AuthService {
       const existingUser = await this.mentoringService.findMenteeByName(
         createUserDto.name,
       );
-      // console.log(existingUser);
       if (existingUser != null) {
         throw new BadRequestException('Mentee with that name already exists');
+      }
+    } else if (createUserDto.role == MainRole.SUPER_ADMIN) {
+      const existingUser = await this.superuserService.findAdminByName(
+        createUserDto.name,
+      );
+      if (existingUser != null) {
+        throw new BadRequestException('Admin with that name already exists');
       }
     }
 

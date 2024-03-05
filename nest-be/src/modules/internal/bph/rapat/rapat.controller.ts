@@ -41,7 +41,7 @@ export class RapatController {
   })
   @ApiBody({ type: CreateRapatDto })
   @Roles(MainRole.SUPER_ADMIN, MainRole.BPH)
-  @ExtraRoles(BPH_ROLE.PJ, BPH_ROLE.WAPJ)
+  @ExtraRoles(BPH_ROLE.PJ, BPH_ROLE.WAPJ, MainRole.SUPER_ADMIN)
   @UseGuards(UserAuth, MainRoleGuard, ExtraRoleGuard)
   @Post()
   async createRapat(@Body() createRapatDto: CreateRapatDto) {

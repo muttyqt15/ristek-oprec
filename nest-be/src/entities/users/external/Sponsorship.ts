@@ -10,9 +10,13 @@ export class Sponsorship {
   @Column()
   package: PaketSponsor; // Or any other fields you need for the sponsorship package
 
-  @ManyToOne(() => Sponsor, (sponsor) => sponsor.sponsorships)
+  @ManyToOne(() => Sponsor, (sponsor) => sponsor.sponsorships, {
+    onDelete: 'CASCADE',
+  })
   sponsor: Sponsor;
 
-  @ManyToOne(() => Acara, (acara) => acara.sponsorships)
+  @ManyToOne(() => Acara, (acara) => acara.sponsorships, {
+    onDelete: 'CASCADE',
+  })
   acara: Acara;
 }

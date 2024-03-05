@@ -12,7 +12,7 @@ export abstract class User {
   @Column()
   batch: number;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
   @Column({

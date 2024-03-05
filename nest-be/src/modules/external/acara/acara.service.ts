@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Acara } from 'src/entities/other/Acara';
 import { In, Repository } from 'typeorm';
 import { CreateAcaraParams } from './types';
-import { PaketSponsor, Sponsor } from 'src/entities/users/external/Sponsor';
+import { Sponsor } from 'src/entities/users/external/Sponsor';
 import { Speaker } from 'src/entities/users/external/Speaker';
 import { hashPassword } from 'src/utils/hash';
 import { CreateSpeakerParams, CreateSponsorParams } from './types/types';
@@ -26,8 +26,12 @@ export class AcaraService {
   ) {}
 
   // Speaker services
-  async findSpeakerById(id: number) {
-    return await this.speakerRepository.findOne({ where: { id } });
+  async getSpeakerById(id: number) {
+    const speaker = await this.speakerRepository.findOne({ where: { id } });
+    if (!speaker) {
+      throw new HttpException('No speaker found!', HttpStatus.NOT_FOUND);
+    }
+    return speaker;
   }
   async getAllSpeaker() {
     return await this.speakerRepository.find({
@@ -54,48 +58,45 @@ export class AcaraService {
 
   async createSpeaker(bodyDetails: CreateSpeakerParams) {
     try {
-      const existingSpeaker = await this.speakerRepository.find({
+      const existingSpeaker = await this.speakerRepository.findOne({
         where: {
           name: bodyDetails.name,
         },
+        relations: ['acara_spoke_in', 'acara_spoke_in.acara'],
       });
-      if (existingSpeaker.length > 0) {
+      if (existingSpeaker) {
         throw new HttpException(
-          `${bodyDetails.name} already exists in speaker database!`,
+          `${bodyDetails.name} already exists in the speaker database!`,
           HttpStatus.CONFLICT,
         );
       }
 
-      // If no existing users with the same role, proceed with creating the new user
+      // If no existing speaker with the same name, proceed with creating the new speaker
       const hashedPassword = await hashPassword(bodyDetails.speaker_code);
       const acaraExists = await this.acaraRepository.find({
         where: {
           id: In(bodyDetails.acaraIds),
         },
-        select: {
-          nama_acara: true,
-          importance: true,
-          location: true,
-        },
       });
       if (acaraExists.length == 0) {
         throw new HttpException('No acara found!', HttpStatus.NOT_FOUND);
       }
+
       const newSpeaker: Speaker = this.speakerRepository.create({
         name: bodyDetails.name,
         expert_field: bodyDetails.expert_field,
         speaker_code: hashedPassword,
-        acara_spoke_in: acaraExists,
       });
-      // Save the speaker first before adding to it
-      await this.speakerRepository.save(newSpeaker);
+
+      await this.speakerRepository.save(newSpeaker); // Save the new speaker entity
       for (const acara of acaraExists) {
         const acaraSpeaker = this.acaraSpeakerRepository.create({
           acara: acara,
           speaker: newSpeaker,
         });
-        await this.acaraSpeakerRepository.save(acaraSpeaker); // Simpan speaker acara relationship ke basis data
+        await this.acaraSpeakerRepository.save(acaraSpeaker); // Simpan sponsorship ke basis data
       }
+
       return newSpeaker;
     } catch (err) {
       // Handle specific errors separately
@@ -110,6 +111,7 @@ export class AcaraService {
       }
     }
   }
+
   async updateSpeakerById(
     speakerId: number,
     updateDetails: Partial<CreateSpeakerParams>,
@@ -180,32 +182,23 @@ export class AcaraService {
   async getAllSponsor() {
     try {
       return await this.sponsorRepository.find({
-        relations: ['sponsorships'],
+        relations: [
+          'sponsorships',
+          'sponsorships.sponsor',
+          'sponsorships.acara',
+        ],
         select: {
           brand_name: true,
-          sponsorships: true,
-        },
-      });
-    } catch (err) {
-      if (err instanceof HttpException) {
-        // If it's a known conflict error, rethrow the same error
-        throw err;
-      } else {
-        console.error(err);
-        throw new HttpException(
-          'Error retrieving sponsors...',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
-  }
-
-  async getSponsorsByPaket(paket: PaketSponsor) {
-    try {
-      return await this.sponsorRepository.find({
-        where: {
           sponsorships: {
-            package: paket,
+            package: true,
+            sponsor: {
+              brand_name: true,
+            },
+            acara: {
+              nama_acara: true,
+              location: true,
+              importance: true,
+            },
           },
         },
       });
@@ -356,7 +349,29 @@ export class AcaraService {
   // Get all events
   async getAllAcara() {
     return await this.acaraRepository.find({
-      relations: ['sponsorships', 'speakers_spoke_in'],
+      relations: [
+        'sponsorships',
+        'speakers_spoke_in',
+        'sponsorships.sponsor',
+        'speakers_spoke_in.speaker',
+      ],
+      select: {
+        nama_acara: true,
+        importance: true,
+        location: true,
+        sponsorships: {
+          package: true,
+          sponsor: {
+            brand_name: true,
+          },
+        },
+        speakers_spoke_in: {
+          id: true,
+          speaker: {
+            name: true,
+          },
+        },
+      },
     });
   }
 
@@ -369,7 +384,25 @@ export class AcaraService {
           'sponsorships',
           'sponsorships.sponsor',
           'speakers_spoke_in',
+          'speakers_spoke_in.speaker',
         ],
+        // select: {
+        //   nama_acara: true,
+        //   importance: true,
+        //   location: true,
+        //   sponsorships: {
+        //     package: true,
+        //     sponsor: {
+        //       brand_name: true,
+        //     },
+        //   },
+        //   speakers_spoke_in: {
+        //     id: true,
+        //     speaker: {
+        //       name: true,
+        //     },
+        //   },
+        // },
       });
       if (!acara) {
         throw new HttpException('Event not found', HttpStatus.NOT_FOUND);

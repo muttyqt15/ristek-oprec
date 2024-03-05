@@ -7,9 +7,13 @@ export class AcaraSpeakerSpokeIn {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Acara, (acara) => acara.speakers_spoke_in)
+  @ManyToOne(() => Acara, (acara) => acara.speakers_spoke_in, {
+    onDelete: 'CASCADE',
+  })
   acara: Acara;
 
-  @ManyToOne(() => Speaker, (speaker) => speaker.acara_spoke_in)
+  @ManyToOne(() => Speaker, (speaker) => speaker.acara_spoke_in, {
+    onDelete: 'CASCADE',
+  })
   speaker: Speaker;
 }

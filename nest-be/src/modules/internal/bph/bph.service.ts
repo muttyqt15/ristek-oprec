@@ -15,7 +15,7 @@ export class BphService {
   ) {}
 
   async findById(id: number) {
-    return await this.bphRepository.findOne({
+    const bph = await this.bphRepository.findOne({
       where: { id },
       select: {
         name: true,
@@ -24,6 +24,10 @@ export class BphService {
         bph_role: true,
       },
     });
+    if (!bph) {
+      throw new HttpException('No member found!', HttpStatus.NOT_FOUND);
+    }
+    return bph;
   }
   async getAllUser() {
     return await this.bphRepository.find({

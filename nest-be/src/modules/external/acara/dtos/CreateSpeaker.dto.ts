@@ -24,8 +24,9 @@ export class CreateSpeakerDto {
   speaker_code: string;
 
   @ApiProperty({
-    description: 'The current events the speaker is speaking in',
+    description: 'The ID of current events the speaker is speaking in',
     example: [1, 2],
   })
+  @IsNotEmpty()
   acaraIds: number[];
 }

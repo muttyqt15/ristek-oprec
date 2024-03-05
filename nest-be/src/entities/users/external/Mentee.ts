@@ -11,9 +11,15 @@ export class Mentee extends User {
   @Column({ default: MainRole.NON_STAFF, nullable: true })
   role: MainRole.NON_STAFF;
 
-  @ManyToOne(() => GroupOKK, (group) => group.mentee, { nullable: true })
+  @ManyToOne(() => GroupOKK, (group) => group.mentee, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   group_okk?: GroupOKK;
 
-  @ManyToOne(() => Mentor, (mentor) => mentor.mentee, { nullable: true })
+  @ManyToOne(() => Mentor, (mentor) => mentor.mentee, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   mentor?: Mentor;
 }

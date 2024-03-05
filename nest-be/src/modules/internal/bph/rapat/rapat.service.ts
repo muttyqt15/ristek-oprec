@@ -15,27 +15,44 @@ export class RapatService {
   ) {}
 
   async createRapat(rapatDetails: CreateRapatParams) {
-    const { list_hadir_ids } = rapatDetails;
-    const bph_list: AnggotaBPH[] = []; // Initialize bph_list as an empty array
+    try {
+      const { list_hadir_ids } = rapatDetails;
+      const bph_list: AnggotaBPH[] = []; // Initialize bph_list as an empty array
 
-    await Promise.all(
-      list_hadir_ids.map(async (id) => {
-        const bph = await this.bphService.findById(id);
-        if (bph) {
-          // Ensure that the entity is retrieved successfully
-          bph_list.push(bph); // Push the retrieved AnggotaBPH entity into bph_list
-        } else {
-          // Handle the case where the entity with the given ID doesn't exist
-          console.error(`AnggotaBPH with ID ${id} not found.`);
-        }
-      }),
-    );
-    const Rapat = await this.rapatRepository.create({
-      // Sesat cok eslint hrsnya await emg diperlukan
-      ...rapatDetails,
-      list_hadir: bph_list,
-    });
-    return await this.rapatRepository.save(Rapat);
+      await Promise.all(
+        list_hadir_ids.map(async (id) => {
+          const bph = await this.bphService.findById(id);
+          if (bph) {
+            // Ensure that the entity is retrieved successfully
+            bph_list.push(bph); // Push the retrieved AnggotaBPH entity into bph_list
+          } else {
+            // Handle the case where the entity with the given ID doesn't exist
+            console.error(`AnggotaBPH with ID ${id} not found.`);
+            throw new HttpException(
+              `AnggotaBPH with ID ${id} not found.`,
+              HttpStatus.NOT_FOUND,
+            );
+          }
+        }),
+      );
+      const Rapat = await this.rapatRepository.create({
+        // Sesat cok eslint hrsnya await emg diperlukan
+        ...rapatDetails,
+        list_hadir: bph_list,
+      });
+      return await this.rapatRepository.save(Rapat);
+    } catch (err) {
+      // Handle specific errors separately
+      if (err instanceof HttpException) {
+        throw err;
+      } else {
+        console.error(err);
+        throw new HttpException(
+          'Error creating rapat...',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   // Get all Rapats
