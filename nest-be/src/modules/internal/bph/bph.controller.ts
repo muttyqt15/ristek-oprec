@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   Patch,
@@ -23,6 +24,7 @@ import { MainRole } from 'src/entities/users/types/entity.types';
 import { CreateBPHDto, UpdateBPHDto } from './bph.dto';
 import { ExtraRoles, Roles } from 'src/auth/roles/roles.decorator';
 import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
+import { BPH_ROLE, DivisiBPH } from 'src/entities/users/types/bph.types';
 
 @ApiTags('BPH')
 @Controller('bph')
@@ -69,6 +71,15 @@ export class BphController {
   @Post()
   async createAnggotaBPH(@Body() createBPHDto: CreateBPHDto) {
     try {
+      if (
+        !Object.keys(DivisiBPH).includes(createBPHDto.divisi) ||
+        !Object.keys(BPH_ROLE).includes(createBPHDto.bph_role)
+      ) {
+        throw new HttpException(
+          'BPH Role doesnt exist!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const newUser = await this.bphService.create(createBPHDto);
       return {
         code: HttpStatus.CREATED,

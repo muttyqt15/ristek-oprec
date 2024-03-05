@@ -5,6 +5,7 @@ import { hashPassword } from 'src/utils/hash';
 import { Repository } from 'typeorm';
 import { UpdatePIDto } from './pi.dto';
 import { CreatePIParams } from './types';
+import { PengurusIntiRole } from 'src/entities/users/types/pi.types';
 
 @Injectable()
 export class PiService {
@@ -28,6 +29,9 @@ export class PiService {
 
   // TODO: PRIVATE: ONLY NON LOGGED IN USERS CAN
   async create(bodyDetails: CreatePIParams) {
+    if (!Object.keys(PengurusIntiRole).includes(bodyDetails.pi_role)) {
+      throw new HttpException('PI Role doesnt exist!', HttpStatus.BAD_REQUEST);
+    }
     try {
       const existingPI = await this.pengurusIntiRepository.find({
         where: {

@@ -58,6 +58,17 @@ export class MentoringService {
     try {
       let { role } = body;
       role = MainRole.MENTOR;
+      const existingMentor = await this.mentorRepository.findOne({
+        where: {
+          name: body.name,
+        },
+      });
+      if (existingMentor) {
+        throw new HttpException(
+          'Mentor already exists!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const hashedPassword = await hashPassword(body.password);
       const mentor = await this.mentorRepository.create({
         ...body,

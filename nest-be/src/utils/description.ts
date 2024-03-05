@@ -32,7 +32,10 @@ Users can refresh their authentication tokens to maintain secure access to the A
 
 # Testing procedure
 
+## While semua endpoint disini dapat ditembak oleh testing platform front-end, tetap disarankan untuk menggunakan Postman atau testing platform resmi lain untuk mempermudah prosedur auth token, ataupun error handling. 
 ## ALL ENDPOINTS CAN BE ACCESSED AS A SUPER ADMIN!
+
+## Study Case
 
 ### Paragraph 1
 #### The assumed conditions are:
@@ -40,7 +43,23 @@ Users can refresh their authentication tokens to maintain secure access to the A
 - Validation for certain entities, e.g BPH divisions can't have more than one PJ, etc
 - CRUD endpoints for making events (acara)
 
-1. Create BPH, PI entities as much as you'd like, the DTO's are also in this documentation!
-2. Most endpoints
+1. CRUD BPH, PI entities as much as you'd like, the DTO's are also in this documentation! Use **auth** or the manual (pi, bph, mentor) endpoints with the proper api body - the difference is that in the manual endpoints, they will return the entity with a null refresh token. If you do decide to use the auth endpoints, sign up first, and login with the same api body.
+2. CRUD events can be tested as much as required too, with the prerequisite that before adding sponsors and speakers, you need to define the speakers and sponsors first! (You can still create an event without sponsors/speakers)
+3. Make sure that the roles you fill in are valid! You can see the available roles at most DTO's!
+
+NOTES:
+BPH and PI members are two different entities derived from a parent class named User. For the roles, I used enums to make it so BPH and PI can have different roles, instead of creating different entities for each and every role. 
+
+### Paragraph 2
+#### The assumed conditions are:
+- OKK Groups can be CRUD
+- Proper auth with these OKK Groups still apply
+
+1. Access the /mentoring/group endpoints to CRUD groups
+2. Before creating any groups, make sure to create the required objects first (e.g creating mentor and mentees first)
+
+### Paragraph 3
+#### The assumed conditions are:
+
 
 `;
