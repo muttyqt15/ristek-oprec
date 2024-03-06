@@ -22,7 +22,7 @@ import { RapatModule } from './modules/internal/bph/rapat/rapat.module';
       password: process.env.MYSQL_DB_PASSWORD,
       database: process.env.MYSQL_DB_NAME,
       entities: entities,
-      synchronize: true, // TypeORM doesn't support database names that have capital letters
+      synchronize: false, // TypeORM doesn't support database names that have capital letters
     }),
     BphModule,
     PiModule,
