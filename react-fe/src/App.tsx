@@ -95,7 +95,7 @@ const App = () => {
         handleRequest={handleRequest}
       />
       <ResponseBody newCode={response} />
-      <h1 className="text-yellow-600 text-lg font-bold mt-12 absolute right-48 top-32 w-64 text-center">
+      <h1 className="hidden xl:flex text-yellow-600 text-lg font-bold mt-12 absolute right-48 top-32 w-64 text-center">
         Get started with the /auth/signup and /auth/login endpoints! <br />{" "}
         Don't forget to read the docs in the backend website! (Both are
         deployed)
