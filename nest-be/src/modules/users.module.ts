@@ -5,7 +5,7 @@ import { PiModule } from './internal/pi/pi.module';
 import { BphModule } from './internal/bph/bph.module';
 import { MentoringModule } from './external/mentoring/mentoring.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SuperAdmin } from 'src/entities/users/superAdmin';
+import { SuperAdmin } from 'src/entities/users/SuperAdmin';
 
 @Module({
   imports: [

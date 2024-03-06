@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SuperAdmin } from 'src/entities/users/superAdmin';
+import { SuperAdmin } from 'src/entities/users/SuperAdmin';
 import { Repository } from 'typeorm';
 import { BaseUser } from './types/BaseUser.type';
 import { hashPassword } from 'src/utils/hash';

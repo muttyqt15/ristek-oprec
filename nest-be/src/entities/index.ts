@@ -9,7 +9,7 @@ import { Sponsorship } from './users/external/Sponsorship';
 import { AnggotaBPH } from './users/panitia/AnggotaBPH';
 import { Mentor } from './users/panitia/Mentor';
 import { PengurusInti } from './users/panitia/PengurusInti';
-import { SuperAdmin } from './users/superAdmin';
+import { SuperAdmin } from './users/SuperAdmin';
 
 const entities = [
   AnggotaBPH,
