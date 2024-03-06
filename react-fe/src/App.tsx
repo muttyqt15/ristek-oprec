@@ -9,7 +9,9 @@ import { hasProtocol } from "./utils/helpers/regex";
 
 const App = () => {
   const { endpoint } = useEndpointContext();
-  const [jsonCode, setJsonCode] = useState<string>("{\n\t\n}");
+  const [jsonCode, setJsonCode] = useState<string>(
+    '{\n\t"name": "kak coolguy",\n\t"batch": 2021,\n\t"password": "coolguysSecret_password",\n\t"role": "SUPER ADMIN"\n}'
+  );
   const [response, setResponse] = useState<JsonCode>({
     "Your response will appear...": "Here!",
   });
@@ -93,6 +95,11 @@ const App = () => {
         handleRequest={handleRequest}
       />
       <ResponseBody newCode={response} />
+      <h1 className="text-yellow-600 text-lg font-bold mt-12 absolute right-48 top-32 w-64 text-center">
+        Get started with the /auth/signup and /auth/login endpoints! <br />{" "}
+        Don't forget to read the docs in the backend website! (Both are
+        deployed)
+      </h1>
       <RequestBody setCode={setJsonCode} code={jsonCode} />
     </Layout>
   );
