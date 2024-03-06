@@ -17,26 +17,28 @@ const RequestBody: React.FC<ReqBodyProps> = ({ setCode, code }) => {
     "userId": "1"
 } */
   return (
-    <div className="w-full mt-4 relative min-h-[800px] border-2 border-yellow-600 rounded-md">
-      <h2 className="bg-yellow-600 z-1 text-black h-16 rounded-md text-center text-lg sm:text-2xl font-bold pt-1 flex items-center justify-center">
-        Request Body
-      </h2>
-      <div className="absolute top-16 h-full w-full z-0">
-        <Editor
-          height="100%"
-          width="100%"
-          value={code}
-          theme="vs-dark"
-          defaultLanguage="json"
-          options={{
-            fontFamily: "Courier New, Courier, monospace",
-            minimap: {
-              enabled: false,
-            },
-            contextmenu: false,
-          }}
-          onChange={(value) => setCode(value || "")} // Pass the onChange handler
-        />
+    <div className="w-full justify-center items-center flex mt-12 relative min-h-48 rounded-md">
+      <div className="w-3/4">
+        <h2 className="bg-yellow-600 z-1 text-black h-8 rounded-t-xl border-none text-center text-lg font-bold pt-1 flex items-center justify-center">
+          Request Body
+        </h2>
+        <div className="h-64 z-0 border-none rounded-xl">
+          <Editor
+            height="100%"
+            width="100%"
+            value={code}
+            theme="vs-dark"
+            defaultLanguage="json"
+            options={{
+              fontFamily: "Courier New, Courier, monospace",
+              minimap: {
+                enabled: false,
+              },
+              contextmenu: false,
+            }}
+            onChange={(value) => setCode(value || "")} // Pass the onChange handler
+          />
+        </div>
       </div>
     </div>
   );
