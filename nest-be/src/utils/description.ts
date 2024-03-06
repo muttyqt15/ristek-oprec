@@ -60,6 +60,30 @@ BPH and PI members are two different entities derived from a parent class named 
 
 ### Paragraph 3
 #### The assumed conditions are:
+- Should be able to create mentors and mentees
+- Mentors and mentees should have proper relationships with groups
 
+1. Access the /mentoring/mentors and /mentoring/mentees endpoints
+2. Mentors and mentees only require extra roles of ROLE: 'NON STAFF' or role: 'MENTOR'
+
+### Paragraph 4
+#### The assumed conditions are:
+- BPH main players (PJ and WaPJ) can create rapat
+- Rapat creation depends on the division, PJ can only create rapat in their own division
+
+1. Access the /rapat and CRUD according to the dto!
+2. Make sure you have the correct roles! (PJ and WaPJ of that division to create)
+
+### Paragraph 5 and 6
+#### The assumed conditions are:
+- Should be able to create sponsors and speakers
+- Sponsors and speakers can be attached to an event
+- Once sponsors and speakers are deleted, the relations to the event are also deleted
+
+Test all you need for these endpoints! The flow is that sponsors, speakers, and events can be created seperately, but creating a sponsor/speaker requires the event ID attached to it, because we don't care about those sponsor and speaker identities if they're not in any event.
+
+# That's all! Thank you!
+
+## I hope my work was to your liking, and I'm always up for constructive feedback!
 
 `;

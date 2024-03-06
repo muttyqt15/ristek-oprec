@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -34,6 +35,7 @@ export class AuthController {
     description: 'Successfully created JWT Access and Refresh Tokens',
   })
   @Post('signup')
+  @ApiBody({ type: AuthDto })
   async signUpUser(@Body() createUserDto: AuthDto) {
     return await this.authService.signUp(createUserDto);
   }
@@ -44,6 +46,7 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Successfully logged user in and renewed their tokens!',
   })
+  @ApiBody({ type: AuthDto })
   @Post('login')
   async loginUser(@Body() createUserDto: AuthDto) {
     return await this.authService.logIn(createUserDto);
