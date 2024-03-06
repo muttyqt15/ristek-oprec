@@ -33,9 +33,7 @@ const Accordion = ({ title, endpoints }: accordionProps) => {
               <li key={index} className="py-1 text-sm text-center">
                 <button
                   onClick={() => {
-                    console.log(endpoint);
                     setEndpoint(endpoint);
-                    console.log("RUns!");
                   }}>
                   {endpoint}
                 </button>
